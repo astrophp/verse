@@ -46,6 +46,22 @@ final class PathGuard
     public static function assertSafe(BuildContext $context): void
     {
         self::assertState($context->root);
+        self::assertSources($context);
+    }
+
+    /**
+     * The checks that need no private state: symbolic links at `content`, `public` and `dist`, and an output
+     * directory that is relative, a link, contains the site, overlaps the sources or sits in `.verse/`.
+     * `verse check` runs only this, so it never has to look at `.verse/`.
+     */
+    public static function assertSources(BuildContext $context): void
+    {
+        $site = rtrim($context->root, '/');
+        foreach (['content', 'public', 'dist'] as $name) {
+            if (is_link($site.'/'.$name)) {
+                throw new FilesystemException('symbolic links are not supported. Replace the link with the real folder.', $name);
+            }
+        }
 
         $raw = $context->outputDir;
         if ($raw === '' || ! str_starts_with($raw, '/')) {

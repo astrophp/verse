@@ -10,7 +10,7 @@ use Astro\Verse\Error\FilesystemException;
 use Closure;
 
 /**
- * The real filesystem, except that renames matching a predicate fail.
+ * The real filesystem, except that renames (and, optionally, removals) matching a predicate fail.
  */
 final class FailingFilesystem implements Filesystem
 {
@@ -21,8 +21,9 @@ final class FailingFilesystem implements Filesystem
 
     /**
      * @param  Closure(string, string): bool  $failRename  true makes `rename($from, $to)` throw
+     * @param  ?Closure(string): bool  $failRemove  true makes `removeTree($path)` throw (nothing is deleted)
      */
-    public function __construct(private readonly Closure $failRename)
+    public function __construct(private readonly Closure $failRename, private readonly ?Closure $failRemove = null)
     {
         $this->local = new LocalFilesystem;
     }
@@ -38,6 +39,9 @@ final class FailingFilesystem implements Filesystem
 
     public function removeTree(string $path): void
     {
+        if ($this->failRemove !== null && ($this->failRemove)($path)) {
+            throw new FilesystemException('cannot delete '.$path.': injected failure');
+        }
         $this->local->removeTree($path);
     }
 
