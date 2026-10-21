@@ -7,6 +7,11 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+### Added
+
+- `verse check` runs the production build in temporary storage and reports errors and warnings
+  without writing `dist/` or `.verse/`.
+
 ## v0.1.0 - 2026-10-21
 
 The first release.

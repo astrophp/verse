@@ -38,7 +38,7 @@ theme into plain static HTML, CSS and JavaScript that any static host can serve.
 > Verse is early software (v0.1). Until v1.0.0, a minor version may change commands, configuration
 > keys, theme views and output; the [changelog](CHANGELOG.md) lists every change.
 
-- Three commands: `verse init`, `verse serve`, `verse build`.
+- Four commands: `verse init`, `verse serve`, `verse check`, `verse build`.
 - Articles, pages, page bundles with attachments, tags, drafts and scheduled posts, external articles.
 - One complete bundled theme (`default`) with light/dark mode, a table of contents, code highlighting
   and ⌘K / Ctrl K search over a static index.
@@ -84,6 +84,7 @@ To run unreleased code from `main`, clone this repository, run `composer install
 verse init my-site
 cd my-site
 verse serve            # preview at http://127.0.0.1:8000 with live reload
+verse check            # run the production build in temporary storage, without writing dist/
 verse build            # write the production site to dist/
 ```
 
@@ -92,6 +93,13 @@ empty folder. It also adds `content/articles/markdown-showcase/`, a draft that s
 feature the theme renders; `verse serve` shows it, `verse build` never publishes it. Until you
 replace the placeholder values (`https://example.com/`, `Your Name`, `your-username`), `verse build`
 warns about them.
+
+`verse check` runs everything `verse build` runs (configuration, theme, content, routes, rendering,
+assets and output validation) in a private temporary folder that it deletes afterwards. It never
+writes `dist/` or `.verse/`, so it is safe to run at any time, also while `verse serve` or
+`verse build` is running. It validates the files as it reads them; it does not take a snapshot of a
+site you are editing at the same time. Errors and warnings are reported exactly as `verse build`
+reports them.
 
 ## Website layout
 
@@ -258,7 +266,7 @@ composer lint        # Pint (--test)
 composer check       # all three
 ```
 
-Not implemented yet: `verse check`, an RSS feed, `sitemap.xml` and `robots.txt`.
+Not implemented yet: an RSS feed, `sitemap.xml` and `robots.txt`.
 
 ## Contributing
 

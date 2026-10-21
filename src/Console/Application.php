@@ -24,6 +24,7 @@ final class Application extends SymfonyApplication
         parent::__construct('Verse', Verse::VERSION);
 
         $this->addCommand(new BuildCommand);
+        $this->addCommand(new CheckCommand);
         $this->addCommand(new InitCommand);
         $this->addCommand(new PreviewBuildCommand);
         $this->addCommand(new ServeCommand);
