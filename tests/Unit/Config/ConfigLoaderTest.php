@@ -60,6 +60,40 @@ final class ConfigLoaderTest extends TestCase
     }
 
     #[Test]
+    public function the_sitemap_is_on_by_default_and_accepts_a_boolean(): void
+    {
+        $this->assertTrue($this->parse("title: x\n")->sitemap);
+        $this->assertTrue($this->parse("title: x\nsitemap: true\n")->sitemap);
+        $this->assertFalse($this->parse("title: x\nsitemap: false\n")->sitemap);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function invalidSitemapValues(): array
+    {
+        return [
+            'quoted true' => ['"true"'],
+            'yes as a string' => ['yes'],
+            'a number' => ['1'],
+            'empty' => [''],
+            'a list' => ['[true]'],
+            'a map' => ['{enabled: true}'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidSitemapValues')]
+    public function it_rejects_a_sitemap_that_is_not_a_boolean(string $value): void
+    {
+        $this->assertConfigError(
+            fn () => $this->parse("title: x\nsitemap: ".$value."\n"),
+            'sitemap',
+            'field "sitemap": expected true or false',
+        );
+    }
+
+    #[Test]
     public function it_loads_a_full_file(): void
     {
         $config = $this->parse(<<<'YAML'

@@ -7,8 +7,15 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+### Added
+
+- `verse build` writes `sitemap.xml` with the published pages, articles, archive and tag pages. Set
+  `sitemap: false` in `verse.yaml` to leave it out.
+
 ### Changed
 
+- A `public/sitemap.xml` now conflicts with the generated sitemap; set `sitemap: false` to keep your
+  own.
 - `verse --version` prints the version Composer installed. A checkout of `main` prints the branch
   and the commit, for example `dev-main (f8d2498)`, instead of the version of the next release.
 

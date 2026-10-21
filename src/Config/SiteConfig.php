@@ -24,6 +24,7 @@ final readonly class SiteConfig
         public string $timezone,
         public ThemeSettings $theme,
         public array $extra,
+        public bool $sitemap = true,
     ) {}
 
     public function basePath(): string

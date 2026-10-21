@@ -5,3 +5,6 @@ tagline: Your role or a short tagline
 author: Your Name
 social_links:
   github: https://github.com/your-username
+
+# Set to false to leave sitemap.xml out of `verse build`.
+sitemap: true

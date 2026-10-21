@@ -35,7 +35,8 @@ application, a CMS or a hosted service.
 
 ## v0.3.0 — next
 
-- An RSS feed, `sitemap.xml` and `robots.txt`.
+- An RSS feed and `robots.txt`.
+- ✓ `sitemap.xml`, on by default (`sitemap: false` turns it off).
 - Broken-link and heading-anchor validation of the built output.
 - Structured data in page metadata.
 
