@@ -54,7 +54,7 @@ final class ApplicationTest extends TestCase
 
         $this->assertSame(0, $exit);
         $this->assertSame('Verse '.Verse::VERSION."\n", $tester->getDisplay());
-        $this->assertSame('Verse 0.1.0-dev', trim($tester->getDisplay()));
+        $this->assertSame('Verse '.Verse::VERSION, trim($tester->getDisplay()));
     }
 
     #[Test]
@@ -116,7 +116,7 @@ final class ApplicationTest extends TestCase
         $process->run();
 
         $this->assertSame(0, $process->getExitCode());
-        $this->assertSame('Verse 0.1.0-dev', trim($process->getOutput()));
+        $this->assertSame('Verse '.Verse::VERSION, trim($process->getOutput()));
     }
 
     #[Test]

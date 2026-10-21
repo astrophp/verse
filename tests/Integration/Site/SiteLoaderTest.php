@@ -15,6 +15,7 @@ use Astro\Verse\Site\PublicationState;
 use Astro\Verse\Site\SiteModel;
 use Astro\Verse\Support\Warnings;
 use Astro\Verse\Tests\Support\TestCase;
+use Astro\Verse\Verse;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
@@ -787,7 +788,7 @@ final class SiteLoaderTest extends TestCase
         $this->assertSame('/notes/', $context->basePath);
         $this->assertSame($root, $context->root);
         $this->assertSame($root.'/dist', $context->outputDir);
-        $this->assertSame('0.1.0-dev', $context->version);
+        $this->assertSame(Verse::VERSION, $context->version);
         $this->assertSame(BuildMode::Production, $context->mode);
         $this->assertFalse($context->drafts);
         $this->assertSame('default', $context->themeName());
