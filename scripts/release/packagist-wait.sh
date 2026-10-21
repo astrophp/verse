@@ -40,7 +40,7 @@ while :; do
         esac
     else
         case "$metadata" in
-            *404*|*"Couldn't open file"*) reason='the package is not on Packagist yet (HTTP 404); submit it first, see "One-time Packagist setup" in docs/releasing.md';;
+            *404*|*"Couldn't open file"*|*"Could not open file"*) reason='the package is not on Packagist yet (HTTP 404); submit it first, see "One-time Packagist setup" in docs/releasing.md';;
             *) reason="the Packagist request failed: $(printf '%s' "$metadata" | head -n 1)";;
         esac
     fi
