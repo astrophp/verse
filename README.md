@@ -46,8 +46,10 @@ verse build            # write the production site to dist/
 ```
 
 `verse init` creates a `verse.yaml`, an About page, a first article and a `.gitignore` in a new or
-empty folder. Until you replace the placeholder values (`https://example.com/`, `Your Name`,
-`your-username`), `verse build` warns about them.
+empty folder. It also adds `content/articles/markdown-showcase/`, a draft that shows every Markdown
+feature the theme renders; `verse serve` shows it, `verse build` never publishes it. Until you
+replace the placeholder values (`https://example.com/`, `Your Name`, `your-username`), `verse build`
+warns about them.
 
 ## Website layout
 
