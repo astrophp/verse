@@ -42,7 +42,6 @@ jobs:
           sha=$(git rev-parse "refs/tags/$TAG^{commit}")
           [ "$(git rev-parse HEAD)" = "$sha" ] || { echo "Checked out commit is not the tagged commit $sha." >&2; exit 1; }
           scripts/release/on-main.sh "$sha"
-          scripts/release/version-matches.sh "$TAG"
           printf 'sha=%s\n' "$sha" >> "$GITHUB_OUTPUT"
 
       - name: Require successful checks
@@ -114,3 +113,25 @@ jobs:
         env:
           TAG: ${{ github.ref_name }}
         run: scripts/release/packagist-wait.sh "$TAG"
+
+  # Turns "## Unreleased" into "## vX.Y.Z - YYYY-MM-DD" on main once the release exists. The
+  # contents API commits without a checkout credential and refuses the update when main's
+  # CHANGELOG.md changed after the tag.
+  changelog:
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts/release
+          persist-credentials: false
+
+      - name: Date the changelog entry on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: scripts/release/publish-changelog.sh "$TAG"

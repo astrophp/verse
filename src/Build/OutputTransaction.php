@@ -51,7 +51,7 @@ final class OutputTransaction
 
     public function markerContents(string $id): string
     {
-        return json_encode(['id' => $id, 'verse' => Verse::VERSION], JSON_THROW_ON_ERROR)."\n";
+        return json_encode(['id' => $id, 'verse' => Verse::version()], JSON_THROW_ON_ERROR)."\n";
     }
 
     public function journalPath(): string

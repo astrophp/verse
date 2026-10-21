@@ -33,6 +33,8 @@ PHPStan and Pint, rebuilds the theme, and installs the package archive into a fr
 that `verse init` and `verse build` work from what a release ships.
 
 - Each pull request should be independently mergeable and green.
+- Add a line under `## Unreleased` in `CHANGELOG.md` for a change users notice. Those lines are the
+  notes of the next release ([releasing](docs/releasing.md)).
 - Add tests for a change in behaviour. Unit tests are in `tests/Unit`; tests that build whole
   websites are in `tests/Integration`, with fixture websites in `tests/Fixtures/sites`.
 - A test must not depend on the wall clock or the machine: pass a fixed "now" (the helpers in

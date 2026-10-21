@@ -788,7 +788,7 @@ final class SiteLoaderTest extends TestCase
         $this->assertSame('/notes/', $context->basePath);
         $this->assertSame($root, $context->root);
         $this->assertSame($root.'/dist', $context->outputDir);
-        $this->assertSame(Verse::VERSION, $context->version);
+        $this->assertSame(Verse::version(), $context->version);
         $this->assertSame(BuildMode::Production, $context->mode);
         $this->assertFalse($context->drafts);
         $this->assertSame('default', $context->themeName());

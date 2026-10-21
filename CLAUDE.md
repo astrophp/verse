@@ -31,7 +31,9 @@ The public roadmap is `ROADMAP.md`. Read it before starting any work.
 ## Workflow
 
 - Branching: `main` only, short-lived feature branches, releases are tags (`v0.1.0`, …).
-- `Astro\Verse\Verse::VERSION` must match the release tag; the release workflow checks it.
+- The version comes from the tag through Composer (`Verse::version()`); there is no version
+  constant to bump. A user-visible change adds its line under `## Unreleased` in `CHANGELOG.md`;
+  the release workflow dates that heading. See `docs/releasing.md`.
 - Each change is independently mergeable and green in CI.
 - Commit and push only when asked.
 

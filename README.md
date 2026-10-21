@@ -76,7 +76,8 @@ vendor/bin/verse build
 ```
 
 To run unreleased code from `main`, clone this repository, run `composer install` and use
-`bin/verse`.
+`bin/verse`. Its `--version` prints the branch and the commit of the last `composer install`, for
+example `Verse dev-main (f8d2498)`.
 
 ## Quick start
 

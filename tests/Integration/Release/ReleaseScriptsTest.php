@@ -73,56 +73,48 @@ final class ReleaseScriptsTest extends TestCase
     // ------------------------------------------------------------------ changelog-entry.sh
 
     #[Test]
-    public function it_matches_changelog_headings_literally(): void
+    public function it_extracts_only_the_unreleased_changelog_body(): void
     {
         $file = $this->temp().'/CHANGELOG.md';
-        file_put_contents($file, "## v0x1y0\n\nNo.\n");
+        file_put_contents($file, "# Changelog\n\nIntro.\n\n## Unreleased\n\nFirst.\n\nSecond.\n\n## v0.0.9 - 2026-10-10\n\nOld.\n");
 
         $process = self::script('changelog-entry.sh', ['v0.1.0', $file]);
 
-        $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString('no heading', $process->getErrorOutput());
-    }
-
-    #[Test]
-    public function it_extracts_only_the_requested_dated_changelog_body(): void
-    {
-        $file = $this->temp().'/CHANGELOG.md';
-        file_put_contents($file, "## v0.1.0 - 2026-10-10\n\nFirst.\n\nSecond.\n\n## v0.0.9\n\nOld.\n");
-
-        $process = self::script('changelog-entry.sh', ['v0.1.0', $file]);
-
-        $this->assertSame(0, $process->getExitCode());
+        $this->assertSame(0, $process->getExitCode(), self::combined($process));
         $this->assertSame("First.\n\nSecond.\n", $process->getOutput());
     }
 
     #[Test]
     #[DataProvider('badChangelogEntries')]
-    public function it_refuses_absent_empty_and_similarly_named_changelog_entries(string $tag, string $contents, string $message): void
+    public function it_refuses_absent_empty_and_similarly_named_unreleased_sections(string $contents, string $message): void
     {
         $file = $this->temp().'/CHANGELOG.md';
         file_put_contents($file, $contents);
 
-        $process = self::script('changelog-entry.sh', [$tag, $file]);
+        $process = self::script('changelog-entry.sh', ['v0.1.0', $file]);
 
         $this->assertSame(1, $process->getExitCode());
+        $this->assertSame('', $process->getOutput());
         $this->assertStringContainsString($message, $process->getErrorOutput());
     }
 
     /**
-     * @return array<string, array{string, string, string}>
+     * @return array<string, array{string, string}>
      */
     public static function badChangelogEntries(): array
     {
+        $absent = 'CHANGELOG.md has no "## Unreleased" heading; add one above the latest release with the notes for v0.1.0.';
+        $empty = 'CHANGELOG.md has no release notes under "## Unreleased"; add the notes for v0.1.0 there.';
+
         return [
-            'longer version' => ['v0.1.0', "## v0.1.01\n\nNo.\n", 'no heading for v0.1.0'],
-            'text instead of a date' => ['v0.1.0', "## v0.1.0 - soon\n\nNo.\n", 'no heading for v0.1.0'],
-            'malformed date' => ['v0.1.0', "## v0.1.0 - 2026-1-1\n\nNo.\n", 'no heading for v0.1.0'],
-            'date without spaces' => ['v0.1.0', "## v0.1.0 -2026-10-10\n\nNo.\n", 'no heading for v0.1.0'],
-            'pre release heading' => ['v0.1.0', "## v0.1.0-rc.1\n\nNo.\n", 'no heading'],
-            'stable heading' => ['v0.1.0-rc.1', "## v0.1.0\n\nNo.\n", 'no heading'],
-            'trailing text' => ['v0.1.0', "## v0.1.0 later\n\nNo.\n", 'no heading'],
-            'empty entry' => ['v0.1.0', "## v0.1.0\n\n## v0.0.9\n", 'entry for v0.1.0 has no release notes'],
+            'only released versions' => ["## v0.0.9\n\nOld.\n", $absent],
+            'heading for the tag' => ["## v0.1.0\n\nNot here.\n", $absent],
+            'bracketed heading' => ["## [Unreleased]\n\nNo.\n", $absent],
+            'lower case' => ["## unreleased\n\nNo.\n", $absent],
+            'trailing text' => ["## Unreleased soon\n\nNo.\n", $absent],
+            'third level' => ["### Unreleased\n\nNo.\n", $absent],
+            'empty section' => ["## Unreleased\n\n## v0.0.9\n\nOld.\n", $empty],
+            'blank lines only' => ["## Unreleased\n\n  \n\n", $empty],
         ];
     }
 
@@ -130,16 +122,13 @@ final class ReleaseScriptsTest extends TestCase
     public function it_reads_a_crlf_changelog(): void
     {
         $file = $this->temp().'/CHANGELOG.md';
-        file_put_contents($file, "## v0.1.0 - 2026-10-10\r\n\r\nFirst.\r\n\r\n### Added\r\n\r\n- Second.\r\n\r\n## v0.0.9\r\n\r\nOld.\r\n");
+        file_put_contents($file, "## Unreleased\r\n\r\nFirst.\r\n\r\n### Added\r\n\r\n- Second.\r\n\r\n## v0.0.9\r\n\r\nOld.\r\n");
 
         $process = self::script('changelog-entry.sh', ['v0.1.0', $file]);
 
         $this->assertSame(0, $process->getExitCode());
         $this->assertSame("First.\n\n### Added\n\n- Second.\n", $process->getOutput());
         $this->assertStringNotContainsString("\r", $process->getOutput());
-
-        file_put_contents($file, "## v0.1.0\r\n\r\nPlain.\r\n");
-        $this->assertSame("Plain.\n", self::script('changelog-entry.sh', ['v0.1.0', $file])->getOutput());
     }
 
     #[Test]
@@ -148,106 +137,148 @@ final class ReleaseScriptsTest extends TestCase
         $process = self::script('changelog-entry.sh', ['v0.1.0', $this->temp().'/none.md']);
 
         $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString('v0.1.0 needs release notes', $process->getErrorOutput());
+        $this->assertStringContainsString('v0.1.0 needs release notes under "## Unreleased"', $process->getErrorOutput());
     }
 
-    // ------------------------------------------------------------------ version-matches.sh
+    // ------------------------------------------------------------------ changelog-release.sh
 
     #[Test]
-    #[DataProvider('matchingVersions')]
-    public function it_accepts_a_version_constant_equal_to_the_tag(string $tag, string $version): void
+    public function it_dates_the_unreleased_heading_and_opens_a_new_one(): void
     {
-        $file = $this->versionFile($version);
+        $file = $this->temp().'/CHANGELOG.md';
+        file_put_contents($file, "# Changelog\n\n## Unreleased\n\n- New.\n\n## v0.0.9 - 2026-10-10\n\n- Old.\n");
 
-        $process = self::script('version-matches.sh', [$tag, $file]);
+        $process = self::script('changelog-release.sh', ['v0.1.0', '2026-10-21', $file]);
 
         $this->assertSame(0, $process->getExitCode(), self::combined($process));
-        $this->assertSame("Verse::VERSION is $version.\n", $process->getOutput());
+        $this->assertSame("# Changelog\n\n## Unreleased\n\n## v0.1.0 - 2026-10-21\n\n- New.\n\n## v0.0.9 - 2026-10-10\n\n- Old.\n", self::read($file));
+
+        $empty = self::script('changelog-entry.sh', ['v0.1.1', $file]);
+        $this->assertSame(1, $empty->getExitCode());
+        $this->assertStringContainsString('no release notes under "## Unreleased"', $empty->getErrorOutput());
+    }
+
+    #[Test]
+    public function it_keeps_crlf_line_endings_when_dating_the_changelog(): void
+    {
+        $file = $this->temp().'/CHANGELOG.md';
+        file_put_contents($file, "## Unreleased\r\n\r\n- New.\r\n");
+
+        $this->assertSame(0, self::script('changelog-release.sh', ['v0.1.0', '2026-10-21', $file])->getExitCode());
+        $this->assertSame("## Unreleased\r\n\r\n## v0.1.0 - 2026-10-21\r\n\r\n- New.\r\n", self::read($file));
+    }
+
+    #[Test]
+    public function it_refuses_to_date_a_changelog_without_an_unreleased_heading_or_with_bad_input(): void
+    {
+        $file = $this->temp().'/CHANGELOG.md';
+        file_put_contents($file, "## v0.0.9\n\n- Old.\n");
+
+        $absent = self::script('changelog-release.sh', ['v0.1.0', '2026-10-21', $file]);
+        $this->assertSame(1, $absent->getExitCode());
+        $this->assertStringContainsString('no "## Unreleased" heading', $absent->getErrorOutput());
+        $this->assertSame("## v0.0.9\n\n- Old.\n", self::read($file));
+
+        $date = self::script('changelog-release.sh', ['v0.1.0', '21.10.2026', $file]);
+        $this->assertSame(1, $date->getExitCode());
+        $this->assertStringContainsString('Invalid release date: 21.10.2026', $date->getErrorOutput());
+
+        $tag = self::script('changelog-release.sh', ['0.1.0', '2026-10-21', $file]);
+        $this->assertSame(1, $tag->getExitCode());
+        $this->assertStringContainsString('Invalid release tag', $tag->getErrorOutput());
+    }
+
+    // ------------------------------------------------------------------ publish-changelog.sh
+
+    #[Test]
+    public function it_commits_the_dated_changelog_to_main_when_main_still_has_the_tagged_changelog(): void
+    {
+        [$directory, $file, $env] = $this->publishSetup("## Unreleased\n\n- New.\n");
+        $blob = self::git($directory, 'hash-object', $file);
+        file_put_contents("$directory/main-sha", $blob);
+
+        $process = self::script('publish-changelog.sh', ['v0.1.0', $file], $env, $directory);
+
+        $this->assertSame(0, $process->getExitCode(), self::combined($process));
+        $this->assertStringContainsString('CHANGELOG.md on main now has "## v0.1.0 - 2026-10-21".', $process->getOutput());
+        $put = self::lines("$directory/put");
+        $this->assertSame(['api', '--method', 'PUT', 'repos/o/r/contents/CHANGELOG.md'], array_slice($put, 0, 4));
+        $this->assertContains('message=Add v0.1.0 to CHANGELOG.md', $put);
+        $this->assertContains('branch=main', $put);
+        $this->assertContains("sha=$blob", $put);
+        $this->assertSame("## Unreleased\n\n## v0.1.0 - 2026-10-21\n\n- New.\n", base64_decode(self::read("$directory/content"), true));
+        $this->assertSame("## Unreleased\n\n- New.\n", self::read($file));
+    }
+
+    #[Test]
+    public function it_refuses_to_date_the_changelog_when_main_changed_after_the_tag(): void
+    {
+        [$directory, $file, $env] = $this->publishSetup("## Unreleased\n\n- New.\n");
+        file_put_contents("$directory/main-sha", 'other');
+        file_put_contents("$directory/main", "## Unreleased\n\n- Later.\n- New.\n");
+
+        $process = self::script('publish-changelog.sh', ['v0.1.0', $file], $env, $directory);
+
+        $this->assertSame(1, $process->getExitCode());
+        $this->assertStringContainsString('CHANGELOG.md on main changed after v0.1.0 was tagged', $process->getErrorOutput());
+        $this->assertStringContainsString('under a "## v0.1.0 - 2026-10-21" heading', $process->getErrorOutput());
+        $this->assertFileDoesNotExist("$directory/put");
+    }
+
+    #[Test]
+    #[DataProvider('releasedHeadings')]
+    public function it_leaves_a_changelog_that_main_already_dated(string $main, int $code): void
+    {
+        [$directory, $file, $env] = $this->publishSetup("## Unreleased\n\n- New.\n");
+        file_put_contents("$directory/main-sha", 'other');
+        file_put_contents("$directory/main", $main);
+
+        $process = self::script('publish-changelog.sh', ['v0.1.0', $file], $env, $directory);
+
+        $this->assertSame($code, $process->getExitCode(), self::combined($process));
+        $this->assertFileDoesNotExist("$directory/put");
     }
 
     /**
-     * @return array<string, array{string, string}>
+     * @return array<string, array{string, int}>
      */
-    public static function matchingVersions(): array
+    public static function releasedHeadings(): array
     {
         return [
-            'stable' => ['v0.1.0', '0.1.0'],
-            'multi digit' => ['v10.20.30', '10.20.30'],
-            'release candidate' => ['v0.1.0-rc.1', '0.1.0-rc.1'],
-            'beta' => ['v1.0.0-beta2', '1.0.0-beta2'],
+            'dated' => ["## Unreleased\n\n## v0.1.0 - 2026-10-21\n\n- New.\n", 0],
+            'undated' => ["## v0.1.0\n\n- New.\n", 0],
+            'crlf' => ["## v0.1.0 - 2026-10-21\r\n\r\n- New.\r\n", 0],
+            'similar version' => ["## v0x1y0\n\n- New.\n", 1],
+            'longer version' => ["## v0.1.01\n\n- New.\n", 1],
+            'pre-release of it' => ["## v0.1.0-rc.1\n\n- New.\n", 1],
         ];
     }
 
     #[Test]
-    #[DataProvider('mismatchingVersions')]
-    public function it_refuses_a_version_constant_that_differs_from_the_tag(string $tag, string $version): void
+    public function it_leaves_the_changelog_alone_for_a_pre_release(): void
     {
-        $file = $this->versionFile($version);
+        [$directory, $file, $env] = $this->publishSetup("## Unreleased\n\n- New.\n");
 
-        $process = self::script('version-matches.sh', [$tag, $file]);
+        $process = self::script('publish-changelog.sh', ['v0.1.0-rc.1', $file], $env, $directory);
 
-        $this->assertSame(1, $process->getExitCode());
-        $this->assertSame('', $process->getOutput());
-        $this->assertStringContainsString(
-            sprintf('Verse::VERSION is %s but the tag is %s. Set it to %s in src/Verse.php and merge that first.', $version, $tag, substr($tag, 1)),
-            $process->getErrorOutput(),
-        );
-    }
-
-    /**
-     * @return array<string, array{string, string}>
-     */
-    public static function mismatchingVersions(): array
-    {
-        return [
-            'dev version against a stable tag' => ['v0.1.0', '0.1.0-dev'],
-            'dev version against a release candidate' => ['v0.1.0-rc.1', '0.1.0-dev'],
-            'older version' => ['v0.2.0', '0.1.0'],
-            'longer version' => ['v0.1.0', '0.1.01'],
-            'stable version against a pre-release tag' => ['v0.1.0-rc.1', '0.1.0'],
-            'pre-release version against a stable tag' => ['v0.1.0', '0.1.0-rc.1'],
-        ];
+        $this->assertSame(0, $process->getExitCode(), self::combined($process));
+        $this->assertStringContainsString('v0.1.0-rc.1 is a pre-release', $process->getOutput());
+        $this->assertFileDoesNotExist("$directory/calls");
     }
 
     #[Test]
-    public function it_refuses_a_missing_version_file(): void
+    public function it_refuses_an_invalid_tag_or_a_missing_repository_when_publishing_the_changelog(): void
     {
-        $file = $this->temp().'/Verse.php';
+        [$directory, $file, $env] = $this->publishSetup("## Unreleased\n\n- New.\n");
 
-        $process = self::script('version-matches.sh', ['v0.1.0', $file]);
+        $tag = self::script('publish-changelog.sh', ['v0.1', $file], $env, $directory);
+        $this->assertSame(1, $tag->getExitCode());
+        $this->assertStringContainsString('Invalid release tag', $tag->getErrorOutput());
 
-        $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString("$file is missing; it holds Verse::VERSION.", $process->getErrorOutput());
-    }
-
-    #[Test]
-    public function it_refuses_a_file_without_the_version_constant(): void
-    {
-        $file = $this->temp().'/Verse.php';
-        file_put_contents($file, "<?php\n\nfinal class Verse\n{\n    public const string NAME = '0.1.0';\n    // public const string VERSION = '0.1.0';\n}\n");
-
-        $process = self::script('version-matches.sh', ['v0.1.0', $file]);
-
-        $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString("Cannot find Verse::VERSION in $file.", $process->getErrorOutput());
-    }
-
-    #[Test]
-    public function it_reads_src_verse_php_by_default(): void
-    {
-        $directory = $this->temp();
-        mkdir("$directory/src");
-        file_put_contents("$directory/src/Verse.php", self::versionSource('0.1.0'));
-
-        $this->assertSame(0, self::script('version-matches.sh', ['v0.1.0'], [], $directory)->getExitCode());
-
-        $mismatch = self::script('version-matches.sh', ['v0.2.0'], [], $directory);
-        $this->assertSame(1, $mismatch->getExitCode());
-        $this->assertStringContainsString('Verse::VERSION is 0.1.0 but the tag is v0.2.0', $mismatch->getErrorOutput());
-
-        $missing = self::script('version-matches.sh', ['v0.1.0'], [], $this->temp());
-        $this->assertSame(1, $missing->getExitCode());
-        $this->assertStringContainsString('src/Verse.php is missing', $missing->getErrorOutput());
+        $repo = self::script('publish-changelog.sh', ['v0.1.0', $file], ['GH_REPO' => ''] + $env, $directory);
+        $this->assertSame(1, $repo->getExitCode());
+        $this->assertStringContainsString('GH_REPO is required', $repo->getErrorOutput());
+        $this->assertFileDoesNotExist("$directory/calls");
     }
 
     // ------------------------------------------------------------------ on-main.sh
@@ -534,7 +565,7 @@ final class ReleaseScriptsTest extends TestCase
     {
         $notes = "Intro `code` and \$(touch /tmp/never) \"quoted\" 'single' \\ back\n\n- Zażółć gęślą jaźń 日本語 🚀\n- \$HOME \${x}\n";
         $directory = $this->temp();
-        file_put_contents("$directory/CHANGELOG.md", "## v0.1.0 - 2026-10-10\n\n$notes\n## v0.0.9\n\nOld.\n");
+        file_put_contents("$directory/CHANGELOG.md", "## Unreleased\n\n$notes\n## v0.0.9\n\nOld.\n");
 
         $entry = self::script('changelog-entry.sh', ['v0.1.0', "$directory/CHANGELOG.md"]);
         $this->assertSame($notes, $entry->getOutput());
@@ -693,7 +724,7 @@ final class ReleaseScriptsTest extends TestCase
     #[Test]
     public function it_refuses_an_invalid_tag_in_preflight(): void
     {
-        [, $clone] = $this->preflightSetup("## v0.1.0-foo\n\nNotes.\n");
+        [, $clone] = $this->preflightSetup();
 
         $process = self::script('preflight.sh', ['v0.1.0-foo'], ['PREFLIGHT_SKIP_RUNS' => '1'], $clone);
 
@@ -742,11 +773,12 @@ final class ReleaseScriptsTest extends TestCase
     #[Test]
     public function it_reads_the_changelog_at_the_checked_commit_not_the_working_tree(): void
     {
-        [, $clone] = $this->preflightSetup("## v0.0.1\n\nOld.\n");
-        file_put_contents("$clone/CHANGELOG.md", "## v0.1.0\n\nOnly local.\n");
+        [, $clone] = $this->preflightSetup("## Unreleased\n\n## v0.0.1\n\nOld.\n");
+        file_put_contents("$clone/CHANGELOG.md", "## Unreleased\n\nOnly local.\n");
         $process = self::script('preflight.sh', ['v0.1.0'], ['PREFLIGHT_SKIP_RUNS' => '1'], $clone);
         $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString('no heading', $process->getErrorOutput());
+        $this->assertStringContainsString('no release notes under "## Unreleased"', $process->getErrorOutput());
+        $this->assertStringNotContainsString('git tag', $process->getOutput());
 
         [, $clone] = $this->preflightSetup();
         file_put_contents("$clone/CHANGELOG.md", "## v0.0.1\n\nOld.\n");
@@ -763,57 +795,6 @@ final class ReleaseScriptsTest extends TestCase
 
         $this->assertSame(1, $process->getExitCode());
         $this->assertStringContainsString('does not exist at commit', $process->getErrorOutput());
-    }
-
-    #[Test]
-    public function it_refuses_a_version_constant_that_differs_from_the_tag_in_preflight(): void
-    {
-        [, $clone] = $this->preflightSetup(version: '0.1.0-dev');
-
-        $process = self::script('preflight.sh', ['v0.1.0'], ['PREFLIGHT_SKIP_RUNS' => '1'], $clone);
-
-        $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString('Verse::VERSION is 0.1.0-dev but the tag is v0.1.0', $process->getErrorOutput());
-        $this->assertStringNotContainsString('git tag', $process->getOutput());
-    }
-
-    #[Test]
-    public function it_refuses_a_missing_src_verse_php_at_the_commit_in_preflight(): void
-    {
-        $remote = $this->repo(['CHANGELOG.md' => "## v0.1.0\n\nNotes.\n"]);
-        $clone = $this->cloneOf($remote);
-
-        $process = self::script('preflight.sh', ['v0.1.0'], ['PREFLIGHT_SKIP_RUNS' => '1'], $clone);
-
-        $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString('src/Verse.php does not exist at commit', $process->getErrorOutput());
-        $this->assertStringNotContainsString('git tag', $process->getOutput());
-    }
-
-    #[Test]
-    public function it_reads_the_version_constant_at_the_checked_commit_not_the_working_tree(): void
-    {
-        [, $clone] = $this->preflightSetup(version: '0.1.0-dev');
-        file_put_contents("$clone/src/Verse.php", self::versionSource('0.1.0'));
-        $process = self::script('preflight.sh', ['v0.1.0'], ['PREFLIGHT_SKIP_RUNS' => '1'], $clone);
-        $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString('Verse::VERSION is 0.1.0-dev', $process->getErrorOutput());
-
-        [, $clone] = $this->preflightSetup();
-        file_put_contents("$clone/src/Verse.php", self::versionSource('0.1.0-dev'));
-        $this->assertSame(0, self::script('preflight.sh', ['v0.1.0'], ['PREFLIGHT_SKIP_RUNS' => '1'], $clone)->getExitCode());
-    }
-
-    #[Test]
-    public function it_checks_the_changelog_before_the_version_constant_in_preflight(): void
-    {
-        [, $clone] = $this->preflightSetup("## v0.0.1\n\nOld.\n", '0.1.0-dev');
-
-        $process = self::script('preflight.sh', ['v0.1.0'], ['PREFLIGHT_SKIP_RUNS' => '1'], $clone);
-
-        $this->assertSame(1, $process->getExitCode());
-        $this->assertStringContainsString('no heading', $process->getErrorOutput());
-        $this->assertStringNotContainsString('Verse::VERSION', $process->getErrorOutput());
     }
 
     #[Test]
@@ -875,6 +856,7 @@ final class ReleaseScriptsTest extends TestCase
         $this->assertSame(['contents' => 'read', 'actions' => 'read'], $jobs['verify']['permissions']);
         $this->assertSame(['contents' => 'write'], $jobs['release']['permissions']);
         $this->assertSame(['contents' => 'read'], $jobs['packagist']['permissions']);
+        $this->assertSame(['contents' => 'write'], $jobs['changelog']['permissions']);
 
         $writes = 0;
         foreach ($jobs as $job) {
@@ -882,7 +864,7 @@ final class ReleaseScriptsTest extends TestCase
                 $writes += $permission === 'write' ? 1 : 0;
             }
         }
-        $this->assertSame(1, $writes);
+        $this->assertSame(2, $writes);
     }
 
     #[Test]
@@ -932,16 +914,16 @@ final class ReleaseScriptsTest extends TestCase
             }
         }
 
-        $this->assertSame(3, $checkouts);
+        $this->assertSame(4, $checkouts);
     }
 
     #[Test]
-    public function the_workflow_wires_the_verify_release_and_packagist_steps_to_their_scripts(): void
+    public function the_workflow_wires_the_verify_release_packagist_and_changelog_steps_to_their_scripts(): void
     {
         $jobs = self::jobs();
 
         $verify = self::runScript($jobs['verify']);
-        foreach (['scripts/release/tag-version.sh "$TAG"', 'scripts/release/on-main.sh "$sha"', 'scripts/release/version-matches.sh "$TAG"', 'scripts/release/wait-for-checks.sh "$SHA"', 'npm run build', 'scripts/release/dist-clean.sh', 'changelog-entry.sh "$TAG"', 'encode-notes.sh'] as $expected) {
+        foreach (['scripts/release/tag-version.sh "$TAG"', 'scripts/release/on-main.sh "$sha"', 'scripts/release/wait-for-checks.sh "$SHA"', 'npm run build', 'scripts/release/dist-clean.sh', 'changelog-entry.sh "$TAG"', 'encode-notes.sh'] as $expected) {
             $this->assertStringContainsString($expected, $verify);
         }
         $release = self::runScript($jobs['release']);
@@ -949,27 +931,13 @@ final class ReleaseScriptsTest extends TestCase
             $this->assertStringContainsString($expected, $release);
         }
         $this->assertStringContainsString('packagist-wait.sh "$TAG"', self::runScript($jobs['packagist']));
+        $this->assertStringContainsString('publish-changelog.sh "$TAG"', self::runScript($jobs['changelog']));
 
         $this->assertSame('verify', $jobs['release']['needs'] ?? null);
         $this->assertSame('release', $jobs['packagist']['needs'] ?? null);
+        $this->assertSame('release', $jobs['changelog']['needs'] ?? null);
         $this->assertGreaterThanOrEqual(35, $jobs['verify']['timeout-minutes']);
         $this->assertGreaterThanOrEqual(25, $jobs['packagist']['timeout-minutes']);
-    }
-
-    #[Test]
-    public function the_workflow_checks_the_version_constant_after_the_commit_is_known_to_be_on_main(): void
-    {
-        $verify = self::runScript(self::jobs()['verify']);
-
-        $onMain = strpos($verify, 'scripts/release/on-main.sh');
-        $version = strpos($verify, 'scripts/release/version-matches.sh "$TAG"');
-        $output = strpos($verify, 'GITHUB_OUTPUT');
-
-        $this->assertNotFalse($onMain);
-        $this->assertNotFalse($version);
-        $this->assertNotFalse($output);
-        $this->assertGreaterThan($onMain, $version);
-        $this->assertGreaterThan($version, $output);
     }
 
     #[Test]
@@ -1074,28 +1042,42 @@ final class ReleaseScriptsTest extends TestCase
     }
 
     /**
-     * A remote whose main holds a changelog and src/Verse.php, and a clone of it.
+     * A remote whose main holds a changelog, and a clone of it.
      *
      * @return array{string, string, string} the remote, the clone and the remote's commit
      */
-    private function preflightSetup(string $changelog = "## v0.1.0\n\nNotes.\n", string $version = '0.1.0'): array
+    private function preflightSetup(string $changelog = "## Unreleased\n\nNotes.\n"): array
     {
-        $remote = $this->repo(['CHANGELOG.md' => $changelog, 'src/Verse.php' => self::versionSource($version)]);
+        $remote = $this->repo(['CHANGELOG.md' => $changelog]);
 
         return [$remote, $this->cloneOf($remote), self::git($remote, 'rev-parse', 'HEAD')];
     }
 
-    private static function versionSource(string $version): string
+    /**
+     * A directory with the tagged changelog and a fake gh: `--jq` prints `main-sha`, the raw read
+     * prints `main`, and a PUT writes its arguments to `put` and the uploaded content to `content`.
+     *
+     * @return array{string, string, array<string, string>} the directory, the changelog and the env
+     */
+    private function publishSetup(string $changelog): array
     {
-        return "<?php\n\ndeclare(strict_types=1);\n\nnamespace Astro\\Verse;\n\nfinal class Verse\n{\n    public const string VERSION = '$version';\n}\n";
-    }
+        $directory = $this->temp();
+        file_put_contents("$directory/CHANGELOG.md", $changelog);
+        $gh = self::executable("$directory/gh", <<<'SH'
+            printf '%s\n' "$*" >> "$FAKE_DIR/calls"
+            case " $* " in
+                *" --method PUT "*)
+                    printf '%s\n' "$@" > "$FAKE_DIR/put"
+                    for arg in "$@"; do
+                        case "$arg" in content=@*) cp "${arg#content=@}" "$FAKE_DIR/content";; esac
+                    done
+                    ;;
+                *" --jq "*) cat "$FAKE_DIR/main-sha" ;;
+                *) cat "$FAKE_DIR/main" ;;
+            esac
+            SH);
 
-    private function versionFile(string $version): string
-    {
-        $file = $this->temp().'/Verse.php';
-        file_put_contents($file, self::versionSource($version));
-
-        return $file;
+        return [$directory, "$directory/CHANGELOG.md", ['RELEASE_GH_COMMAND' => $gh, 'GH_REPO' => 'o/r', 'RELEASE_DATE' => '2026-10-21', 'FAKE_DIR' => $directory, 'PATH' => (string) getenv('PATH')]];
     }
 
     private static function executable(string $path, string $body): string
