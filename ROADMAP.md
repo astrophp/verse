@@ -33,10 +33,13 @@ application, a CMS or a hosted service.
 
 - `verse check`, which validates a website with the production pipeline without publishing it.
 
-## v0.3.0 — next
+## v0.3.0
+
+- `sitemap.xml`, on by default (`sitemap: false` turns it off).
+
+## Next
 
 - An RSS feed and `robots.txt`.
-- ✓ `sitemap.xml`, on by default (`sitemap: false` turns it off).
 - Broken-link and heading-anchor validation of the built output.
 - Structured data in page metadata.
 
