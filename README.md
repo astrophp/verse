@@ -13,7 +13,7 @@
 <p align="center">
   <a href="https://github.com/astrophp/verse/actions/workflows/tests.yml"><img src="https://github.com/astrophp/verse/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
   <a href="composer.json"><img src="https://img.shields.io/badge/PHP-8.4%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.4 or later"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/astrophp/verse" alt="MIT licence"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT licence"></a>
 </p>
 
 <p align="center">
