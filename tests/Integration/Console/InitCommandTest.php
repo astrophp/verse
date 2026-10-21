@@ -19,6 +19,8 @@ final class InitCommandTest extends TestCase
         '.gitignore',
         'content/about.md',
         'content/articles/hello-verse.md',
+        'content/articles/markdown-showcase/diagram.svg',
+        'content/articles/markdown-showcase/page.md',
         'verse.yaml',
     ];
 
@@ -110,6 +112,8 @@ final class InitCommandTest extends TestCase
         $this->assertStringContainsString('```php', $scaffold['content/articles/hello-verse.md']);
         $this->assertSame(2, preg_match_all('/^## /m', $scaffold['content/articles/hello-verse.md']));
         $this->assertStringNotContainsString('articles', $scaffold['verse.yaml']);
+        // the showcase is a draft: shown by `verse serve`, never published by `verse build`
+        $this->assertStringContainsString("\ndraft: true\n", $scaffold['content/articles/markdown-showcase/page.md']);
     }
 
     #[Test]
@@ -303,8 +307,9 @@ final class InitCommandTest extends TestCase
         $parent = $this->parent();
         $tester = $this->runInit($parent, ['demo-site']);
 
-        $expected = "Created 4 files in {$parent}/demo-site:\n"
-            ."  .gitignore\n  content/about.md\n  content/articles/hello-verse.md\n  verse.yaml\n"
+        $expected = "Created 6 files in {$parent}/demo-site:\n"
+            ."  .gitignore\n  content/about.md\n  content/articles/hello-verse.md\n"
+            ."  content/articles/markdown-showcase/diagram.svg\n  content/articles/markdown-showcase/page.md\n  verse.yaml\n"
             ."\n".self::UTC_LINE."\n\nNext steps:\n  cd demo-site\n  verse build\n";
         $this->assertSame($expected, $tester->getDisplay());
         $this->assertStringNotContainsString('serve', $tester->getDisplay());
@@ -408,6 +413,7 @@ final class InitCommandTest extends TestCase
         $this->assertFileExists($root.'/dist/about/index.html');
         $this->assertFileExists($root.'/dist/tags/verse/index.html');
         $this->assertFileExists($root.'/dist/articles/index.html');
+        $this->assertDirectoryDoesNotExist($root.'/dist/articles/markdown-showcase');
         $this->assertStringContainsString('Hello, Verse', (string) file_get_contents($root.'/dist/articles/hello-verse/index.html'));
         // the home page lists the one article; the archive counts it
         $this->assertStringContainsString('Hello, Verse', (string) file_get_contents($root.'/dist/index.html'));
