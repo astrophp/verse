@@ -3,8 +3,8 @@
 #
 # Checks that a release can be tagged and prints the commands that tag the commit it checked. It
 # fetches origin/main (updating that remote-tracking ref), so it is read-only for the repository's
-# history and the remote: it creates no tag and pushes nothing. It reads CHANGELOG.md and
-# Verse::VERSION as committed on origin/main, not from your working tree, and does not wait for
+# history and the remote: it creates no tag and pushes nothing. It reads the "## Unreleased" notes
+# of CHANGELOG.md as committed on origin/main, not from your working tree, and does not wait for
 # workflow runs: a run still in progress is reported and the script exits non-zero
 # (PREFLIGHT_WAIT_SECONDS=600 waits up to 600 s).
 #
@@ -41,14 +41,6 @@ git show "$sha:CHANGELOG.md" > "$changelog" 2> /dev/null || {
     exit 1
 }
 "$dir/changelog-entry.sh" "$tag" "$changelog" > /dev/null
-
-version_file=$(mktemp)
-trap 'rm -f "$changelog" "$version_file"' EXIT
-git show "$sha:src/Verse.php" > "$version_file" 2> /dev/null || {
-    printf 'src/Verse.php does not exist at commit %s.\n' "$sha" >&2
-    exit 1
-}
-"$dir/version-matches.sh" "$tag" "$version_file" > /dev/null
 
 if [ "${PREFLIGHT_SKIP_RUNS:-0}" = 1 ]; then
     printf 'Skipping workflow-run checks because PREFLIGHT_SKIP_RUNS=1.\n' >&2

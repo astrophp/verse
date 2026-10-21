@@ -5,6 +5,13 @@ All notable changes to Verse are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Until v1.0.0, a minor version may change
 commands, configuration keys, theme views and output.
 
+## Unreleased
+
+### Changed
+
+- `verse --version` prints the version Composer installed. A checkout of `main` prints the branch
+  and the commit, for example `dev-main (f8d2498)`, instead of the version of the next release.
+
 ## v0.2.0 - 2026-10-21
 
 ### Added

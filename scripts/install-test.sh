@@ -9,6 +9,10 @@
 #   3. As a dependency: a fresh Composer project requires astrophp/verse from the archive through
 #      a path repository and runs vendor/bin/verse init and build.
 #
+# Verse reads its version from Composer. The archive has no git history, so both installs are given
+# the tag of the commit (v0.0.0 when it has none), as Packagist gives the tag, and `verse --version`
+# has to print it.
+#
 # Everything happens in a temporary folder that is removed at the end (INSTALL_KEEP=1 keeps it).
 set -euo pipefail
 
@@ -62,8 +66,14 @@ for required in bin/verse src/Verse.php resources/scaffold/verse.yaml themes/def
 done
 printf 'The archive ships: %s\n' "$(cd "$work/package" && ls -A | tr '\n' ' ')"
 
-version=$(sed -n "s/^[[:space:]]*public const string VERSION = '\([^']*\)';.*/\1/p" "$work/package/src/Verse.php")
-[ -n "$version" ] || fail 'cannot read Verse::VERSION from the archive'
+version=$(git -C "$root" describe --tags --exact-match "$ref" 2> /dev/null || printf 'v0.0.0')
+
+# Fails unless the given verse command prints the version Composer was given, without its "v".
+check_version() {
+    local printed
+    printed=$("$@" --version) || fail "$* --version failed"
+    [ "$printed" = "Verse ${version#v}" ] || fail "$* --version printed \"$printed\", expected \"Verse ${version#v}\""
+}
 
 # Builds a new website with the given verse command and checks the output.
 check_site() {
@@ -85,8 +95,8 @@ check_site() {
 }
 
 step 'Run from the extracted archive'
-(cd "$work/package" && composer install --no-dev --prefer-dist --no-interaction --no-progress)
-php "$work/package/bin/verse" --version | grep -qF "$version" || fail "verse --version does not print $version"
+(cd "$work/package" && COMPOSER_ROOT_VERSION=$version composer install --no-dev --prefer-dist --no-interaction --no-progress)
+check_version php "$work/package/bin/verse"
 check_site from-archive php "$work/package/bin/verse"
 
 step 'Install as a Composer dependency'
@@ -105,6 +115,7 @@ JSON
 rm -rf "$work/package/vendor"
 (cd "$work/project" && composer require "astrophp/verse:$version" --prefer-dist --no-interaction --no-progress)
 [ -x "$work/project/vendor/bin/verse" ] || fail 'composer did not install vendor/bin/verse'
+check_version "$work/project/vendor/bin/verse"
 check_site from-dependency "$work/project/vendor/bin/verse"
 
-printf '\nInstall test passed for Verse %s.\n' "$version"
+printf '\nInstall test passed for Verse %s.\n' "${version#v}"

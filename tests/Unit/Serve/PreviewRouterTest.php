@@ -34,7 +34,7 @@ final class PreviewRouterTest extends TestCase
             'secret.txt' => 'public file',
         ];
         if ($marker) {
-            $files['.verse-output'] = '{"id":"'.self::GENERATION.'","verse":"0.1.0-dev"}'."\n";
+            $files['.verse-output'] = '{"id":"'.self::GENERATION.'","verse":"0.2.0"}'."\n";
         }
         $this->site = $this->makeSite(['verse.yaml' => 'title: X'.PHP_EOL, 'content/about.md' => '# x']);
         $this->preview = $this->site.'/.verse/preview/public';

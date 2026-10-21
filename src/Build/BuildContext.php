@@ -54,7 +54,7 @@ final readonly class BuildContext
             mode: $mode,
             drafts: $drafts,
             config: $config,
-            version: Verse::VERSION,
+            version: Verse::version(),
             now: $now ?? new DateTimeImmutable('now'),
             basePath: $config->basePath(),
             root: $root,

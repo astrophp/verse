@@ -21,7 +21,7 @@ final class Application extends SymfonyApplication
 
     public function __construct()
     {
-        parent::__construct('Verse', Verse::VERSION);
+        parent::__construct('Verse', Verse::version());
 
         $this->addCommand(new BuildCommand);
         $this->addCommand(new CheckCommand);
@@ -32,7 +32,7 @@ final class Application extends SymfonyApplication
 
     public function getLongVersion(): string
     {
-        return 'Verse '.Verse::VERSION;
+        return 'Verse '.Verse::version();
     }
 
     /**
