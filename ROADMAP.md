@@ -29,9 +29,12 @@ application, a CMS or a hosted service.
 - One complete bundled theme, `default`, configured from `verse.yaml` (logo, accent colour, table of
   contents), with light and dark mode and static search.
 
-## v0.2.0 — next
+## v0.2.0
 
-- `verse check`, which validates a website without publishing it.
+- `verse check`, which validates a website with the production pipeline without publishing it.
+
+## v0.3.0 — next
+
 - An RSS feed, `sitemap.xml` and `robots.txt`.
 - Broken-link and heading-anchor validation of the built output.
 - Structured data in page metadata.
