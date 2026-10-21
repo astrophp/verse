@@ -1,0 +1,16 @@
+# Dependencies
+/vendor/
+node_modules/
+
+# Caches and local tooling
+/.phpunit.cache/
+.phpunit.result.cache
+.claude/
+.idea/
+.vscode/
+.DS_Store
+npm-debug.log*
+
+# Test fixture build output
+/tests/Fixtures/sites/*/dist/
+/tests/Fixtures/sites/*/.verse/

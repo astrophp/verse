@@ -1,0 +1,146 @@
+/* Component: tag index page. */
+
+.tags-page {
+  padding-bottom: 70px;
+}
+
+.tag-index {
+  border-top: 1px solid var(--line);
+  margin-top: 7px;
+}
+
+.tag-index-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  border-bottom: 1px solid var(--line);
+  padding: 25px 0;
+}
+
+.tag-index-row>div {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.tag-hash {
+  color: var(--subtle);
+  font: 18px var(--mono);
+}
+
+.tag-index-row h2 {
+  font-size: 23px;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: -.5px;
+}
+
+.tag-index-meta {
+  font-size: 11px;
+  color: var(--secondary);
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.tag-index-row:hover h2,
+.tag-index-row:hover .tag-index-meta {
+  color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .tag-index-row h2 {
+    font-size: 21px;
+  }
+
+  .tag-index-meta {
+    gap: 18px;
+    font-size: 10px;
+  }
+
+  .tag-index-row {
+    padding: 23px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .tags-page {
+    padding-bottom: 50px;
+  }
+
+  .tag-index-row>div {
+    gap: 13px;
+  }
+
+  .tag-index-row h2 {
+    font-size: 20px;
+  }
+
+  .tag-index-meta {
+    gap: 14px;
+  }
+}
+
+.tag-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  max-width: 360px;
+  color: var(--secondary);
+}
+
+.tag-filter:focus-within {
+  border-color: var(--accent);
+}
+
+.tag-filter input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.tag-filter input::placeholder {
+  color: var(--subtle);
+}
+
+.tag-filter-icon {
+  display: inline-flex;
+}
+
+.tag-filter-empty {
+  color: var(--secondary);
+  margin: 8px 0 60px;
+}
+
+.tags-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.tags-intro .tag-filter {
+  margin: 0;
+  flex: 0 1 300px;
+}
+
+@media (max-width: 600px) {
+  .tag-filter {
+    max-width: none;
+  }
+
+  .tags-intro .tag-filter {
+    flex-basis: 100%;
+    max-width: none;
+  }
+}

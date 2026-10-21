@@ -1,0 +1,74 @@
+/* Syntax highlighting: the hl-* classes emitted by tempest/highlight's CssTheme, coloured with the --syntax-* tokens. */
+
+.hl-keyword {
+  color: var(--syntax-keyword);
+}
+
+.hl-type {
+  color: var(--syntax-type);
+}
+
+.hl-property {
+  color: var(--syntax-property);
+}
+
+.hl-value,
+.hl-literal {
+  color: var(--syntax-value);
+}
+
+.hl-number {
+  color: var(--syntax-number);
+}
+
+.hl-variable {
+  color: var(--syntax-variable);
+}
+
+.hl-generic {
+  color: var(--syntax-generic);
+}
+
+.hl-operator {
+  color: var(--syntax-operator);
+}
+
+.hl-comment {
+  color: var(--syntax-comment);
+}
+
+.hl-attribute,
+.hl-em {
+  font-style: italic;
+}
+
+.hl-strong {
+  font-weight: 600;
+}
+
+.hl-blur {
+  filter: blur(2px);
+}
+
+.hl-addition,
+.hl-deletion {
+  display: inline-block;
+  min-width: 100%;
+}
+
+.hl-addition {
+  background: var(--syntax-added);
+}
+
+.hl-deletion {
+  background: var(--syntax-removed);
+}
+
+.hl-gutter {
+  display: inline-block;
+  padding: 0 1ch;
+  margin-right: 1ch;
+  font-size: .9em;
+  color: var(--syntax-comment);
+  user-select: none;
+}

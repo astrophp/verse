@@ -1,0 +1,4 @@
+name: default
+description: The Verse editorial theme.
+entries: [src/app.css, src/app.js]
+settings: {logo: null, accent: null, toc: true}

@@ -1,0 +1,39 @@
+{
+  "../../node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2": {
+    "file": "inter-latin-ext-wght-normal-DO1Apj_S.woff2",
+    "src": "../../node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2"
+  },
+  "../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2": {
+    "file": "inter-latin-wght-normal-Dx4kXJAl.woff2",
+    "src": "../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2"
+  },
+  "../../node_modules/@fontsource-variable/manrope/files/manrope-latin-ext-wght-normal.woff2": {
+    "file": "manrope-latin-ext-wght-normal-Ch3YOpNY.woff2",
+    "src": "../../node_modules/@fontsource-variable/manrope/files/manrope-latin-ext-wght-normal.woff2"
+  },
+  "../../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2": {
+    "file": "manrope-latin-wght-normal-DHIcAJRg.woff2",
+    "src": "../../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2"
+  },
+  "src/app.css": {
+    "file": "app-Bpi9bJdw.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "src/app.css",
+    "isEntry": true,
+    "assets": [
+      "inter-latin-ext-wght-normal-DO1Apj_S.woff2",
+      "inter-latin-wght-normal-Dx4kXJAl.woff2",
+      "manrope-latin-ext-wght-normal-Ch3YOpNY.woff2",
+      "manrope-latin-wght-normal-DHIcAJRg.woff2"
+    ]
+  },
+  "src/app.js": {
+    "file": "app-qFMpj3ef.js",
+    "name": "app",
+    "src": "src/app.js",
+    "isEntry": true
+  }
+}

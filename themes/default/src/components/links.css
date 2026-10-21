@@ -1,0 +1,87 @@
+/* Component: text links, back links, tag links, inline link rows. */
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.5;
+}
+
+.text-link .icon {
+  transition: transform .18s;
+}
+
+.text-link:hover .icon {
+  transform: translateX(3px);
+}
+
+.back-link {
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+.text-link {
+  color: var(--accent);
+  font-size: 12px;
+  gap: 9px;
+  font-weight: 500;
+}
+
+.text-link>span {
+  border: 0;
+  padding: 0;
+}
+
+.text-link:hover {
+  color: var(--ink);
+}
+
+.tag-link {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font: 10px/1.5 var(--sans);
+  color: var(--secondary);
+  background: var(--paper);
+  transition: background .15s,color .15s,border-color .15s;
+}
+
+.tag-link:hover {
+  color: var(--ink);
+  background: var(--hover);
+  border-color: var(--subtle);
+}
+
+.tag-link[aria-current] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tag-link[aria-current]:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tag-back {
+  margin-bottom: 23px;
+  font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  .tag-link {
+    font-size: 10px;
+    padding: 3px 7px;
+  }
+
+  .tag-back {
+    margin-bottom: 18px;
+  }
+}

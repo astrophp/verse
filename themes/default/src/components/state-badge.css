@@ -1,0 +1,25 @@
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  font: 600 9.5px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 4px 7px 3px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  vertical-align: middle;
+}
+
+/* Beats the `.page-intro p` and `.timeline-page .page-intro p` rules by coming later in the layer. */
+.page-intro p.state-line {
+  margin: 0 0 14px;
+  line-height: 1;
+}
+
+@media print {
+  .state-badge,
+  .state-line {
+    display: none !important;
+  }
+}

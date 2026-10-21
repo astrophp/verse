@@ -1,0 +1,17 @@
+/* Component: 404 page. */
+
+.not-found {
+  text-align: center;
+  padding: 100px 0;
+}
+
+.not-found p {
+  color: var(--secondary);
+  margin: 20px 0 30px;
+}
+
+.not-found h1 {
+  font-size: 45px;
+  font-weight: 550;
+  letter-spacing: -1.5px;
+}

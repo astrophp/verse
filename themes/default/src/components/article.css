@@ -1,0 +1,325 @@
+/* Component: article header, meta, layout, table of contents, progress, related article. */
+
+.small-label {
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  font-weight: 550;
+}
+
+.reading-progress {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--accent);
+  width: 0;
+  transition: width .1s linear;
+}
+
+.article-back {
+  padding-top: 32px;
+}
+
+.article-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.article-header h1 {
+  max-width: 850px;
+}
+
+.article-deck {
+  color: var(--secondary);
+  max-width: 740px;
+}
+
+.article-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 25px;
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+.article-meta .separator {
+  color: var(--line);
+  margin-inline: 3px;
+}
+
+.article-meta a {
+  color: var(--ink);
+}
+
+.article-meta .article-topic {
+  color: var(--accent);
+}
+
+.article-layout {
+  display: grid;
+  align-items: start;
+  padding-top: 38px;
+}
+
+.toc {
+  position: sticky;
+  top: 124px;
+  border-left: 1px solid var(--line);
+}
+
+.toc-label {
+  font: 10px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--secondary);
+  margin: 0 0 13px;
+}
+
+.toc a {
+  display: block;
+  line-height: 1.6;
+  color: var(--secondary);
+  padding: 7px 0;
+}
+
+.toc a:hover {
+  color: var(--accent);
+}
+
+.toc a[aria-current=true] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.toc .toc-footer {
+  font-size: 10px;
+  color: var(--subtle);
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 16px;
+}
+
+.mobile-toc {
+  display: none;
+}
+
+.article-end {
+  border-top: 1px solid var(--line);
+  padding: 28px 0 36px;
+  margin-top: 43px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.article-end p {
+  font-size: 12px;
+  color: var(--secondary);
+  margin: 0;
+}
+
+.article-end .text-link {
+  font-size: 12px;
+}
+
+.related-article {
+  padding: 28px 0 45px;
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  margin-bottom: 25px;
+}
+
+.related-article .small-label {
+  color: var(--secondary);
+  font-size: 10px;
+}
+
+.related-article a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 13px;
+}
+
+.related-article a:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .article-back {
+    padding-top: 24px;
+  }
+
+  .article-meta {
+    gap: 9px;
+    font-size: 10px;
+  }
+
+  .article-layout {
+    padding-top: 26px;
+  }
+
+  .toc {
+    display: none;
+  }
+
+  .mobile-toc {
+    display: block;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 28px;
+    padding-bottom: 15px;
+    font-size: 12px;
+    color: var(--secondary);
+  }
+
+  .mobile-toc summary {
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: .04em;
+  }
+
+  .mobile-toc nav {
+    display: grid;
+    gap: 8px;
+    padding-top: 15px;
+  }
+
+  .mobile-toc a:hover {
+    color: var(--accent);
+  }
+
+  .article-end {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .article-meta {
+    line-height: 1.8;
+  }
+}
+
+@media print {
+  .article-layout {
+    display: block;
+  }
+}
+
+.article-header {
+  max-width: 860px;
+  padding: 33px 0 28px;
+}
+
+.article-header h1 {
+  font: 600 48px/1.14 var(--sans);
+  letter-spacing: -1.7px;
+}
+
+.article-deck {
+  font-size: 16px;
+  line-height: 1.8;
+  margin-top: 21px;
+}
+
+.article-layout {
+  grid-template-columns: minmax(0,700px) 200px;
+  gap: 90px;
+}
+
+.toc {
+  padding-left: 20px;
+}
+
+.toc a {
+  font-size: 11px;
+}
+
+.related-article a {
+  font: 550 23px/1.4 var(--sans);
+  letter-spacing: -.5px;
+}
+
+@media (max-width: 1100px) {
+  .article-layout {
+    gap: 55px;
+    grid-template-columns: minmax(0,1fr) 170px;
+  }
+}
+
+@media (max-width: 900px) {
+  .article-header h1 {
+    font-size: 43px;
+  }
+}
+
+@media (max-width: 760px) {
+  .article-layout {
+    display: block;
+  }
+
+  .article-header h1 {
+    font-size: 39px;
+    letter-spacing: -1.3px;
+  }
+
+  .article-deck {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .article-header h1 {
+    font-size: 34px;
+    letter-spacing: -1.1px;
+  }
+
+  .article-meta {
+    font-size: 10px;
+  }
+
+  .article-deck {
+    font-size: 13px;
+  }
+
+  .related-article a {
+    font-size: 20px;
+  }
+
+  .article-back {
+    padding-top: 23px;
+  }
+
+  .article-header {
+    padding-top: 27px;
+  }
+}
+
+.article-topic {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.article-topic .tag-link {
+  font-size: 10px;
+  padding: 2px 6px;
+  color: var(--secondary);
+}
+
+@media (max-width: 600px) {
+  .article-meta .separator:last-of-type {
+    display: none;
+  }
+}
+
+/* No table of contents (plain pages, short articles): one column at the prose measure.
+   The :not(:has(.toc)) selector is more specific than every .article-layout rule above,
+   so it also wins inside their media queries; the grid collapses to one column everywhere
+   (print and the 760px breakpoint are already single-column blocks). */
+.article-layout:not(:has(.toc)) {
+  grid-template-columns: minmax(0,700px);
+}

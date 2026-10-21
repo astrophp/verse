@@ -1,0 +1,164 @@
+/* Base: reset, document defaults, links, buttons, focus, selection, utilities, icons. */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 0;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+button {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+input,
+select {
+  font: inherit;
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+
+input,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+summary:focus-visible,
+[tabindex='0']:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 5px;
+  border-radius: 3px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 450;
+}
+
+p {
+  margin: 0;
+}
+
+h1:focus,
+h2:focus,
+main:focus {
+  outline: none;
+}
+
+button {
+  border: 0;
+  background: none;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: -100px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 12px 20px;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon.small {
+  width: 15px;
+  height: 15px;
+}
+
+.icon.large {
+  width: 22px;
+  height: 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--sans);
+}

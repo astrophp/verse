@@ -1,0 +1,79 @@
+{
+    "name": "astrophp/verse-cli",
+    "description": "AstroPHP Verse: a static site generator. Write in Markdown, design with Blade, publish anywhere.",
+    "type": "project",
+    "keywords": [
+        "static-site-generator",
+        "ssg",
+        "markdown",
+        "blade",
+        "static-site",
+        "blog",
+        "cli"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/astrophp/verse",
+    "support": {
+        "issues": "https://github.com/astrophp/verse/issues",
+        "source": "https://github.com/astrophp/verse",
+        "docs": "https://github.com/astrophp/verse#readme"
+    },
+    "authors": [
+        {
+            "name": "Melih Ucar",
+            "homepage": "https://github.com/astrophp"
+        }
+    ],
+    "bin": [
+        "bin/verse"
+    ],
+    "require": {
+        "php": "^8.4",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "symfony/console": "^8.1",
+        "symfony/yaml": "^8.1",
+        "symfony/process": "^8.1",
+        "league/commonmark": "^2.10",
+        "illuminate/view": "^13",
+        "tempest/highlight": "^2.29"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13",
+        "phpstan/phpstan": "^2",
+        "laravel/pint": "^1"
+    },
+    "suggest": {
+        "ext-pcntl": "Clean Ctrl-C handling in `verse serve`"
+    },
+    "autoload": {
+        "psr-4": {
+            "Astro\\Verse\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Astro\\Verse\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "8.4.1"
+        },
+        "sort-packages": true,
+        "optimize-autoloader": false
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "lint": "pint --test",
+        "check": [
+            "@test",
+            "@analyse",
+            "@lint"
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

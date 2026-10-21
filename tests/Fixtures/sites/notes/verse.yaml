@@ -1,0 +1,9 @@
+title: Notes
+tagline: A fixture site for the Verse test suite
+url: https://example.test/
+description: Fixture notes on architecture, AI systems and reliable software. Not a real site.
+author:
+  name: Fixture Author
+social_links:
+  github: https://github.com/fixture-author
+  linkedin: https://www.linkedin.com/in/fixture-author/

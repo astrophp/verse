@@ -1,0 +1,543 @@
+/* Prose: rendered Markdown, code blocks, tables, callouts, captions. */
+
+.prose {
+  min-width: 0;
+}
+
+.prose h2 {
+  margin-top: 42px;
+  scroll-margin-top: calc(var(--header) + 24px);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h3 {
+  margin: 26px 0 12px;
+  scroll-margin-top: calc(var(--header) + 24px);
+}
+
+.prose p {
+  margin-bottom: 19px;
+  color: var(--secondary);
+}
+
+.prose strong {
+  color: var(--ink);
+}
+
+.prose a {
+  border-bottom: 1px solid var(--accent);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 24px;
+  color: var(--secondary);
+  margin: 14px 0 22px;
+}
+
+.prose li {
+  padding-left: 4px;
+  margin-bottom: 8px;
+}
+
+.prose li::marker {
+  color: var(--accent);
+}
+
+.prose code:not(pre code) {
+  font-family: var(--mono);
+  font-size: .82em;
+  background: var(--sage);
+  color: var(--ink);
+  padding: 3px 6px;
+  border-radius: 3px;
+  overflow-wrap: anywhere;
+}
+
+.prose blockquote {
+  margin: 28px 0;
+  padding: 0 0 0 24px;
+  border-left: 2px solid var(--accent);
+}
+
+.prose blockquote p {
+  color: var(--ink);
+  margin: 0;
+}
+
+.callout {
+  padding: 20px 23px;
+  border-left: 2px solid var(--accent);
+  margin: 26px 0;
+  line-height: 1.8;
+  border-radius: 0 5px 5px 0;
+}
+
+.prose .callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout-title {
+  font-weight: 600;
+  color: var(--ink) !important;
+  margin-bottom: 7px !important;
+}
+
+.code-block {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  overflow: hidden;
+  margin: 25px 0;
+  background: var(--code);
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding: 9px 16px;
+  font: 10px var(--mono);
+  color: var(--secondary);
+}
+
+.copy-code {
+  font: 10px var(--mono);
+  padding: 5px 8px;
+  border-radius: 4px;
+  color: var(--secondary);
+  min-width: 46px;
+}
+
+.copy-code:hover {
+  background: var(--sage);
+  color: var(--ink);
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 22px 24px;
+  overflow: auto;
+  scrollbar-width: thin;
+  font: 12px/1.95 var(--mono);
+  tab-size: 4;
+}
+
+.code-block code {
+  font: inherit;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 25px 0;
+  max-width: 100%;
+}
+
+.prose table {
+  width: 100%;
+  min-width: 440px;
+  border-collapse: collapse;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.prose th {
+  color: var(--ink);
+  font-weight: 550;
+  border-block: 1px solid var(--line);
+  padding: 13px 14px 13px 0;
+}
+
+.prose td {
+  color: var(--secondary);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 14px 14px 0;
+  vertical-align: top;
+}
+
+.prose .caption {
+  font-size: 11px;
+  color: var(--secondary);
+}
+
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.prose figure {
+  margin: 25px 0;
+}
+
+.prose figure img {
+  margin: 0;
+}
+
+.prose figcaption {
+  font-size: 11px;
+  color: var(--secondary);
+}
+
+.prose p:where(:has(> img:only-child)) {
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+@media (max-width: 760px) {
+  .prose h2 {
+    margin-top: 35px;
+  }
+
+  .code-block pre {
+    padding: 20px 16px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 520px) {
+  .prose blockquote {
+    padding-left: 18px;
+  }
+
+  .callout {
+    padding: 17px;
+  }
+}
+
+@media print {
+  .code-block,
+  .callout,
+  table {
+    break-inside: avoid;
+  }
+}
+
+.prose {
+  font-size: 15px;
+  line-height: 1.95;
+}
+
+.prose h2 {
+  font: 550 26px/1.4 var(--sans);
+  letter-spacing: -.6px;
+  margin-bottom: 17px;
+}
+
+.prose h3 {
+  font: 550 20px/1.5 var(--sans);
+  letter-spacing: -.4px;
+}
+
+.prose blockquote {
+  font: 450 22px/1.65 var(--sans);
+  letter-spacing: -.4px;
+  border-left-color: var(--line);
+}
+
+.prose strong {
+  font-weight: 550;
+}
+
+.callout {
+  font-size: 13px;
+  background: var(--hover);
+  border-left-color: var(--accent);
+}
+
+.prose table {
+  font-size: 12px;
+}
+
+.code-block pre {
+  color: var(--ink);
+}
+
+.code-header {
+  font-size: 10px;
+}
+
+@media (max-width: 760px) {
+  .prose {
+    font-size: 14px;
+  }
+
+  .prose h2 {
+    font-size: 25px;
+  }
+
+  .prose h3 {
+    font-size: 20px;
+  }
+
+  .prose blockquote {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .prose h2 {
+    font-size: 24px;
+    line-height: 1.4;
+  }
+}
+
+/* Footnotes (league/commonmark markup): sup > a.footnote-ref, div.footnotes > hr + ol > li, a.footnote-backref. */
+
+.prose sup {
+  font-size: .75em;
+  line-height: 0;
+}
+
+.prose .footnote-ref,
+.prose .footnote-backref {
+  border-bottom: 0;
+  color: var(--accent);
+}
+
+.prose .footnote-ref {
+  padding-inline: 1px;
+}
+
+.prose sup[id],
+.prose .footnotes li {
+  scroll-margin-top: calc(var(--header) + 24px);
+}
+
+.footnotes {
+  margin-top: 43px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--secondary);
+}
+
+.footnotes hr {
+  margin: 0 0 19px;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.prose .footnotes ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.prose .footnotes li {
+  margin-bottom: 8px;
+}
+
+.prose .footnotes p {
+  margin: 0;
+  font-size: inherit;
+}
+
+.prose .footnotes li:target {
+  color: var(--ink);
+}
+
+/* Callout kinds (GitHub alert syntax): each kind colours the rule, the title and a faint tint, and puts its
+   icon before the title (a mask, so it takes the title colour). A callout without a kind keeps the plain
+   style above. */
+.callout-note {
+  --callout: var(--callout-note);
+  --callout-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5M12 7.6v.4'/%3E%3C/svg%3E");
+}
+
+.callout-tip {
+  --callout: var(--callout-tip);
+  --callout-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z'/%3E%3C/svg%3E");
+}
+
+.callout-important {
+  --callout: var(--callout-important);
+  --callout-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v11h-8l-4 4v-4H4Z'/%3E%3Cpath d='M12 8.5v3.5M12 14.4v.1'/%3E%3C/svg%3E");
+}
+
+.callout-warning {
+  --callout: var(--callout-warning);
+  --callout-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4 3 19.5h18Z'/%3E%3Cpath d='M12 10v4.5M12 17v.1'/%3E%3C/svg%3E");
+}
+
+.callout-caution {
+  --callout: var(--callout-caution);
+  --callout-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8.3 3h7.4L21 8.3v7.4L15.7 21H8.3L3 15.7V8.3Z'/%3E%3Cpath d='M12 8v5M12 16v.1'/%3E%3C/svg%3E");
+}
+
+.callout:is(.callout-note, .callout-tip, .callout-important, .callout-warning, .callout-caution) {
+  border-left-color: var(--callout);
+  background: color-mix(in srgb, var(--callout) var(--callout-tint), var(--hover));
+}
+
+.callout:is(.callout-note, .callout-tip, .callout-important, .callout-warning, .callout-caution) .callout-title {
+  color: var(--callout) !important;
+}
+
+.callout:is(.callout-note, .callout-tip, .callout-important, .callout-warning, .callout-caution) .callout-title::before {
+  content: '';
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 8px;
+  vertical-align: -3px;
+  background-color: currentColor;
+  -webkit-mask: var(--callout-icon) center / contain no-repeat;
+  mask: var(--callout-icon) center / contain no-repeat;
+}
+
+/* Code blocks, refined (user, 2026-10-20): larger, calmer code; a header bar with the language and a Copy
+   button with an icon. Later rules here override the original code-block rules above. */
+.code-block {
+  border-radius: 10px;
+}
+
+.code-header {
+  padding: 7px 8px 7px 16px;
+  background: var(--code-header);
+  font-size: 11px;
+  letter-spacing: .02em;
+}
+
+.code-header > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.code-header > span::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .8;
+}
+
+.copy-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+
+.copy-code::before {
+  content: '';
+  width: 13px;
+  height: 13px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='8' width='12' height='12' rx='2'/%3E%3Cpath d='M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='8' width='12' height='12' rx='2'/%3E%3Cpath d='M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.copy-code:hover {
+  background: var(--hover);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.code-block pre {
+  padding: 18px 20px 20px;
+  font-size: 13px;
+  line-height: 1.7;
+  scrollbar-color: var(--line) transparent;
+}
+
+.code-block pre:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+@media (max-width: 760px) {
+  .code-block pre {
+    padding: 16px;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+}
+
+/* Horizontal rule (`---`): a single hairline in the theme's line colour instead of the browser's bevelled
+   default. Direct children only, so the footnotes divider keeps its own rule. */
+.prose > hr {
+  height: 0;
+  margin: 40px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 760px) {
+  .prose > hr {
+    margin: 32px 0;
+  }
+}
+
+/* Tables, refined (user, 2026-10-20): the same framed card as code blocks, a tinted header row, even cell
+   padding, hairline rows, and Markdown column alignment (`align` attributes) kept. Later rules here
+   override the original table rules above. */
+.table-scroll {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.prose table {
+  font-size: 13px;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.prose th,
+.prose td {
+  padding: 11px 16px;
+  text-align: left;
+}
+
+.prose :is(th, td)[align=center] {
+  text-align: center;
+}
+
+.prose :is(th, td)[align=right] {
+  text-align: right;
+}
+
+.prose th {
+  background: var(--code-header);
+  border-block: 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.prose td {
+  border-bottom: 1px solid var(--line);
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.prose tbody tr:hover td {
+  background: var(--hover);
+}
+
+@media (max-width: 760px) {
+  .prose table {
+    font-size: 12px;
+  }
+
+  .prose th,
+  .prose td {
+    padding: 9px 12px;
+  }
+}
