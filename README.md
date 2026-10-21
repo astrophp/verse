@@ -35,8 +35,8 @@ Markdown files with YAML front matter and one `verse.yaml`; Verse renders it thr
 theme into plain static HTML, CSS and JavaScript that any static host can serve.
 
 > [!WARNING]
-> Verse is pre-release software (`0.1.0-dev`). Commands, configuration keys, theme views and output
-> may still change without notice.
+> Verse is early software (v0.1). Until v1.0.0, a minor version may change commands, configuration
+> keys, theme views and output; the [changelog](CHANGELOG.md) lists every change.
 
 - Three commands: `verse init`, `verse serve`, `verse build`.
 - Articles, pages, page bundles with attachments, tags, drafts and scheduled posts, external articles.
@@ -61,9 +61,6 @@ Install Verse globally with Composer from
 composer global require astrophp/verse
 verse --version
 ```
-
-Until v0.1.0 is tagged, Packagist has only the development version; install it with
-`composer global require astrophp/verse:dev-main`.
 
 Composer puts `verse` in its global bin directory. If your shell cannot find the command, add that
 directory to your `PATH`; `composer global config bin-dir --absolute` prints it. Update with

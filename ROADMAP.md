@@ -29,14 +29,14 @@ application, a CMS or a hosted service.
 - One complete bundled theme, `default`, configured from `verse.yaml` (logo, accent colour, table of
   contents), with light and dark mode and static search.
 
-Still to come before v0.1.0 is tagged:
+## v0.2.0 — next
 
 - `verse check`, which validates a website without publishing it.
 - An RSS feed, `sitemap.xml` and `robots.txt`.
 - Broken-link and heading-anchor validation of the built output.
 - Structured data in page metadata.
 
-## After v0.1.0
+## Later
 
 These are ideas, not promises.
 

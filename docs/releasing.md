@@ -6,8 +6,6 @@
    - `CHANGELOG.md` has an entry for the version: a heading `## vX.Y.Z`, optionally followed by
      ` - YYYY-MM-DD` (a date in exactly that shape; other text after the version is refused), then
      the release notes. The heading must match the tag exactly and the entry must not be empty.
-   - For v0.1.0 only: remove the "Until v0.1.0 is tagged" `dev-main` note from the README's
-     Installation section.
 2. Wait until the `tests` and `install` workflow runs for the head of `main` are green.
 3. Run `scripts/release/preflight.sh vX.Y.Z`, then run the `git tag … && git push …` command it
    prints, which tags the commit it checked.

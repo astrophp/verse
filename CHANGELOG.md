@@ -5,10 +5,9 @@ All notable changes to Verse are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Until v1.0.0, a minor version may change
 commands, configuration keys, theme views and output.
 
-## Unreleased
+## v0.1.0 - 2026-10-21
 
-The first release. Rename this heading to `## v0.1.0 - YYYY-MM-DD` when it is tagged; see
-[docs/releasing.md](docs/releasing.md).
+The first release.
 
 ### Added
 
