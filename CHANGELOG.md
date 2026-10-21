@@ -7,6 +7,8 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+## v0.3.0 - 2026-10-21
+
 ### Added
 
 - `verse build` writes `sitemap.xml` with the published pages, articles, archive and tag pages. Set
