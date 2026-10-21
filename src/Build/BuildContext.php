@@ -31,6 +31,14 @@ final readonly class BuildContext
         return new self($this->mode, $this->drafts, $this->config, $this->version, $this->now, $this->basePath, $this->root, $outputDir);
     }
 
+    /**
+     * Whether this build writes `sitemap.xml`: production builds unless `sitemap: false`.
+     */
+    public function publishesSitemap(): bool
+    {
+        return $this->mode === BuildMode::Production && $this->config->sitemap;
+    }
+
     public function themeName(): string
     {
         return $this->config->theme->name;

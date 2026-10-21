@@ -6,6 +6,7 @@ namespace Astro\Verse\Site;
 
 use Astro\Verse\Build\BuildContext;
 use Astro\Verse\Build\SearchIndex;
+use Astro\Verse\Build\Sitemap;
 use Astro\Verse\Content\ContentScanner;
 use Astro\Verse\Content\FrontMatter;
 use Astro\Verse\Content\FrontMatterParser;
@@ -62,7 +63,7 @@ final class SiteLoader
         $menu = $this->menu($pages);
 
         $registry = new OutputRegistry;
-        $this->claimOutputs($registry, $standalone, $articles, $publicFiles);
+        $this->claimOutputs($registry, $context, $standalone, $articles, $publicFiles);
 
         return new SiteModel(
             context: $context,
@@ -204,12 +205,16 @@ final class SiteLoader
      */
     private function claimOutputs(
         OutputRegistry $registry,
+        BuildContext $context,
         array $standalone,
         Articles $articles,
         array $publicFiles,
     ): void {
         $registry->claim('404.html', 'the 404 page', ClaimSource::System);
         $registry->claim(SearchIndex::PATH, 'the search index', ClaimSource::System);
+        if ($context->publishesSitemap()) {
+            $registry->claim(Sitemap::PATH, 'the sitemap', ClaimSource::System);
+        }
         $registry->claim('.verse-output', 'the Verse output marker', ClaimSource::System);
 
         $registry->claim('index.html', 'the home page');

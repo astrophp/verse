@@ -65,7 +65,7 @@ final class ConfigLoader
         $fields = new Fields(YamlMap::parse($yaml, $error), $error);
 
         $fields->rejectUnknown(
-            ['title', 'tagline', 'url', 'description', 'author', 'social_links', 'language', 'timezone', 'theme', 'extra'],
+            ['title', 'tagline', 'url', 'description', 'author', 'social_links', 'language', 'timezone', 'sitemap', 'theme', 'extra'],
             ' (put custom values under "extra")',
         );
 
@@ -89,6 +89,7 @@ final class ConfigLoader
             timezone: $this->timezone($fields),
             theme: $this->theme($fields, $root, $error),
             extra: $fields->map('extra') ?? [],
+            sitemap: $fields->bool('sitemap', true),
         );
     }
 

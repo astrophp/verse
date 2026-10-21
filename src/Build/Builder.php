@@ -245,6 +245,9 @@ final class Builder
         }
 
         $this->put($staging, SearchIndex::PATH, (new SearchIndex($site))->encode());
+        if ($site->context->publishesSitemap()) {
+            $this->put($staging, Sitemap::PATH, (new Sitemap($site))->xml());
+        }
 
         foreach ($manifest->files() as $file) {
             $this->import($staging, OutputRegistry::THEME_PREFIX.$file, $distPath.'/'.$file);
