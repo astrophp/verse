@@ -1,0 +1,116 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    # Up to 20 minutes waiting for tests and install, then npm ci and the build.
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      notes: ${{ steps.notes.outputs.notes }}
+    steps:
+      # Full history brings every branch (origin/main) and tag; the repository is public, so
+      # nothing later needs the checkout token and it is not kept.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Verify tag and commit
+        id: commit
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          scripts/release/tag-version.sh "$TAG"
+          sha=$(git rev-parse "refs/tags/$TAG^{commit}")
+          [ "$(git rev-parse HEAD)" = "$sha" ] || { echo "Checked out commit is not the tagged commit $sha." >&2; exit 1; }
+          scripts/release/on-main.sh "$sha"
+          scripts/release/version-matches.sh "$TAG"
+          printf 'sha=%s\n' "$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Require successful checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SHA: ${{ steps.commit.outputs.sha }}
+        run: scripts/release/wait-for-checks.sh "$SHA"
+
+      - name: Verify committed theme build
+        run: |
+          npm ci
+          npm run build
+          scripts/release/dist-clean.sh
+
+      - name: Read release notes
+        id: notes
+        env:
+          TAG: ${{ github.ref_name }}
+        run: scripts/release/changelog-entry.sh "$TAG" | scripts/release/encode-notes.sh >> "$GITHUB_OUTPUT"
+
+  release:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts/release
+          persist-credentials: false
+
+      - name: Refuse an existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh api --paginate "repos/$GH_REPO/releases?per_page=100" --jq '.[].tag_name' > release-tags.txt
+          if scripts/release/release-exists.sh "$TAG" < release-tags.txt; then
+            exit 1
+          fi
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          NOTES: ${{ needs.verify.outputs.notes }}
+        run: |
+          scripts/release/decode-notes.sh release-notes.md
+          scripts/release/create-release.sh "$TAG" release-notes.md
+
+  packagist:
+    needs: release
+    runs-on: ubuntu-latest
+    # Up to 20 minutes of polling.
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts/release
+          persist-credentials: false
+
+      - name: Wait for Packagist
+        env:
+          TAG: ${{ github.ref_name }}
+        run: scripts/release/packagist-wait.sh "$TAG"

@@ -1,6 +1,34 @@
-# AstroPHP Verse
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/astrophp/verse/main/art/logo-dark.svg">
+    <img src="https://raw.githubusercontent.com/astrophp/verse/main/art/logo-light.svg" alt="Verse logo" width="240">
+  </picture>
+</p>
 
-> **Write in Markdown. Design with Blade. Publish anywhere.**
+<p align="center">
+  <strong>Write in Markdown. Design with Blade. Publish anywhere.</strong><br>
+  A static site generator written in PHP.
+</p>
+
+<p align="center">
+  <a href="https://github.com/astrophp/verse/actions/workflows/tests.yml"><img src="https://github.com/astrophp/verse/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
+  <a href="composer.json"><img src="https://img.shields.io/badge/PHP-8.4%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.4 or later"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/astrophp/verse" alt="MIT licence"></a>
+</p>
+
+<p align="center">
+  <a href="#installation">Install</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#configuration-verseyaml">Configuration</a> ·
+  <a href="ROADMAP.md">Roadmap</a>
+</p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/astrophp/verse/main/art/home-dark.png">
+    <img src="https://raw.githubusercontent.com/astrophp/verse/main/art/home-light.png" alt="The home page of a Verse website in the default theme: the site description, then the latest articles in a timeline grouped by month, each with its date, description and tags." width="900">
+  </picture>
+</p>
 
 Verse is a command-line static site generator written in PHP. A website is an ordinary folder of
 Markdown files with YAML front matter and one `verse.yaml`; Verse renders it through a bundled Blade
@@ -26,15 +54,32 @@ Node.js is needed only to work on the bundled theme inside this repository, neve
 
 ## Installation
 
-Verse is not published on Packagist yet. Run it from a checkout:
+Install Verse globally with Composer from
+[Packagist](https://packagist.org/packages/astrophp/verse):
 
 ```bash
-git clone https://github.com/astrophp/verse.git
-cd verse
-composer install
-ln -s "$PWD/bin/verse" /usr/local/bin/verse
+composer global require astrophp/verse
 verse --version
 ```
+
+Until v0.1.0 is tagged, Packagist has only the development version; install it with
+`composer global require astrophp/verse:dev-main`.
+
+Composer puts `verse` in its global bin directory. If your shell cannot find the command, add that
+directory to your `PATH`; `composer global config bin-dir --absolute` prints it. Update with
+`composer global update astrophp/verse`.
+
+A website can also pin its own Verse version, for example to build it in CI. Run this in the website
+folder (after `verse init`, which only works in a new or empty folder) and add `/vendor/` to its
+`.gitignore`:
+
+```bash
+composer require --dev astrophp/verse
+vendor/bin/verse build
+```
+
+To run unreleased code from `main`, clone this repository, run `composer install` and use
+`bin/verse`.
 
 ## Quick start
 
@@ -218,11 +263,12 @@ composer check       # all three
 
 Not implemented yet: `verse check`, an RSS feed, `sitemap.xml` and `robots.txt`.
 
-### Contributing
+## Contributing
 
-Issues and pull requests are welcome once the repository is public. Please keep changes focused,
-add tests for behaviour changes, and make sure `composer check` passes. If you change the theme
-sources, rebuild and commit `themes/default/dist/`.
+Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the setup, the
+commands to run and the rules a change has to keep, and the [roadmap](ROADMAP.md) for what Verse is
+and is not meant to do. Report security problems privately, as [SECURITY.md](SECURITY.md)
+describes. Changes are listed in the [changelog](CHANGELOG.md).
 
 ## License
 

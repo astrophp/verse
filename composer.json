@@ -1,5 +1,5 @@
 {
-    "name": "astrophp/verse-cli",
+    "name": "astrophp/verse",
     "description": "AstroPHP Verse: a static site generator. Write in Markdown, design with Blade, publish anywhere.",
     "type": "project",
     "keywords": [
