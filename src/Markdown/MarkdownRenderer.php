@@ -6,6 +6,7 @@ namespace Astro\Verse\Markdown;
 
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Event\DocumentParsedEvent;
+use League\CommonMark\Event\DocumentPreParsedEvent;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\CommonMark\Node\Block\FencedCode;
 use League\CommonMark\Extension\CommonMark\Node\Block\IndentedCode;
@@ -14,6 +15,7 @@ use League\CommonMark\Extension\Table\Table;
 use League\CommonMark\Extension\Table\TableExtension;
 use League\CommonMark\Extension\Table\TableRenderer;
 use League\CommonMark\MarkdownConverter;
+use League\CommonMark\Normalizer\UniqueSlugNormalizerInterface;
 use League\CommonMark\Renderer\HtmlDecorator;
 use Tempest\Highlight\Highlighter;
 
@@ -22,8 +24,9 @@ use Tempest\Highlight\Highlighter;
  * escaped, unsafe links are neutralised, code is escaped or highlighted, and the result is meant to be
  * printed unescaped exactly once and never compiled by Blade.
  *
- * Every render builds its own environment, so the per-document state (link resolver, used heading ids,
- * outline) lives in listeners that exist for one invocation only.
+ * The CommonMark environment is built once per renderer. The per-document state (link resolver and
+ * source path, used heading ids, outline) lives in a LinkRewriter and a HeadingIndexer created for each
+ * render. Renders must not be nested, because the CommonMark parser is not re-entrant.
  */
 final class MarkdownRenderer
 {
@@ -37,15 +40,15 @@ final class MarkdownRenderer
 
     private const int HEADINGS = -40;
 
-    public function __construct(private readonly Highlighter $highlighter = new Highlighter) {}
+    private readonly MarkdownConverter $converter;
 
-    /**
-     * @param  string  $sourcePath  site-relative file the Markdown comes from; relative links resolve against its folder
-     */
-    public function render(string $markdown, string $sourcePath, LinkResolver $links): RenderedMarkdown
+    // The per-document passes of the render in progress; set by render(), cleared when it ends.
+    private ?LinkRewriter $links = null;
+
+    private ?HeadingIndexer $headings = null;
+
+    public function __construct(Highlighter $highlighter = new Highlighter)
     {
-        $headings = new HeadingIndexer;
-
         $environment = new Environment([
             'html_input' => 'escape',
             'allow_unsafe_links' => false,
@@ -55,7 +58,7 @@ final class MarkdownRenderer
         $environment->addExtension(new TableExtension);
         $environment->addExtension(new FootnoteExtension);
 
-        $code = new CodeBlockRenderer($this->highlighter);
+        $code = new CodeBlockRenderer($highlighter);
         $environment->addRenderer(FencedCode::class, $code, 10);
         $environment->addRenderer(IndentedCode::class, $code, 10);
         $environment->addRenderer(Table::class, new HtmlDecorator(
@@ -66,12 +69,38 @@ final class MarkdownRenderer
         $environment->addRenderer(Figure::class, new FigureRenderer);
         $environment->addRenderer(Callout::class, new CalloutRenderer);
 
-        $environment->addEventListener(DocumentParsedEvent::class, new LinkRewriter($links, $sourcePath), self::LINKS);
+        // A render that throws never reaches CommonMark's own end-of-document reset of the slug
+        // history (used for inline footnote ids), so clear it before every document as well.
+        $environment->addEventListener(DocumentPreParsedEvent::class, static function () use ($environment): void {
+            $normalizer = $environment->getSlugNormalizer();
+            if ($normalizer instanceof UniqueSlugNormalizerInterface) {
+                $normalizer->clearHistory();
+            }
+        });
+
+        $environment->addEventListener(DocumentParsedEvent::class, fn (DocumentParsedEvent $event) => $this->links?->__invoke($event), self::LINKS);
         $environment->addEventListener(DocumentParsedEvent::class, new CalloutTransformer, self::CALLOUTS);
         $environment->addEventListener(DocumentParsedEvent::class, new FigureTransformer, self::FIGURES);
-        $environment->addEventListener(DocumentParsedEvent::class, $headings, self::HEADINGS);
+        $environment->addEventListener(DocumentParsedEvent::class, fn (DocumentParsedEvent $event) => $this->headings?->__invoke($event), self::HEADINGS);
 
-        $html = (new MarkdownConverter($environment))->convert($markdown)->getContent();
+        $this->converter = new MarkdownConverter($environment);
+    }
+
+    /**
+     * @param  string  $sourcePath  site-relative file the Markdown comes from; relative links resolve against its folder
+     */
+    public function render(string $markdown, string $sourcePath, LinkResolver $links): RenderedMarkdown
+    {
+        $headings = new HeadingIndexer;
+        $this->links = new LinkRewriter($links, $sourcePath);
+        $this->headings = $headings;
+
+        try {
+            $html = $this->converter->convert($markdown)->getContent();
+        } finally {
+            $this->links = null;
+            $this->headings = null;
+        }
 
         return new RenderedMarkdown($html, $headings->outline(), self::countWords($html));
     }

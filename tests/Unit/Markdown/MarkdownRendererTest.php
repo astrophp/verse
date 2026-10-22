@@ -367,6 +367,63 @@ final class MarkdownRendererTest extends TestCase
         $this->assertSame($first->html, $renderer->render("## Same\n\n## Same\n\n> [!NOTE]\n> x\n", 'content/a.md', $links)->html);
     }
 
+    #[Test]
+    public function documents_in_sequence_resolve_links_with_their_own_resolver_and_source_path(): void
+    {
+        $renderer = new MarkdownRenderer;
+        $firstLinks = new RecordingLinkResolver(static fn (string $url): string => '/one/'.$url);
+        $secondLinks = new RecordingLinkResolver(static fn (string $url): string => '/two/'.$url);
+        $markdown = "Note^[same note] and [a link](page.md).\n\n[^1]: Extra.\n\nText[^1].\n";
+
+        $first = $renderer->render($markdown, 'content/a/x.md', $firstLinks);
+        $firstCalls = $firstLinks->calls;
+        $second = $renderer->render($markdown, 'content/b/y.md', $secondLinks);
+
+        $this->assertNotEmpty($firstCalls);
+        $this->assertSame($firstCalls, $firstLinks->calls);
+        $this->assertContains(['content/a/x.md', 'page.md', false], $firstLinks->calls);
+        $this->assertContains(['content/b/y.md', 'page.md', false], $secondLinks->calls);
+        foreach ($secondLinks->calls as $call) {
+            $this->assertSame('content/b/y.md', $call[0]);
+        }
+        $this->assertStringContainsString('/one/page.md', $first->html);
+        $this->assertStringContainsString('/two/page.md', $second->html);
+        $this->assertStringNotContainsString('/one/', $second->html);
+        $this->assertSame(
+            str_replace('/one/', '/two/', $first->html),
+            $second->html,
+            'footnote ids and numbering must not drift between documents',
+        );
+    }
+
+    #[Test]
+    public function a_renderer_recovers_after_a_link_resolver_throws(): void
+    {
+        $markdown = "## Title\n\nNote^[same note] here.\n";
+        $failing = new class implements LinkResolver
+        {
+            public function resolve(string $sourcePath, string $url, bool $isImage): string
+            {
+                throw new ContentException('Broken link.', $sourcePath);
+            }
+        };
+
+        $renderer = new MarkdownRenderer;
+        try {
+            $renderer->render("## Gone\n\nNote^[same note] and [bad](missing.md).\n", 'content/a.md', $failing);
+            $this->fail('The resolver exception should have propagated.');
+        } catch (ContentException) {
+            // expected
+        }
+
+        $recovered = $renderer->render($markdown, 'content/b.md', new RecordingLinkResolver);
+        $fresh = (new MarkdownRenderer)->render($markdown, 'content/b.md', new RecordingLinkResolver);
+
+        $this->assertSame($fresh->html, $recovered->html);
+        $this->assertEquals($fresh->headings, $recovered->headings);
+        $this->assertSame(['title'], self::ids($recovered));
+    }
+
     // --- callouts (item 4) -----------------------------------------------------------------------
 
     #[Test]
