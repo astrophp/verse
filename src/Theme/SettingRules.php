@@ -49,7 +49,7 @@ final class SettingRules
 
     private static function logo(Fields $fields, ?string $siteRoot): string
     {
-        $logo = $fields->nonEmptyString('logo') ?? '';
+        $logo = $fields->trimmedString('logo') ?? '';
 
         if (HttpUrl::isValid($logo)) {
             return $logo;

@@ -248,7 +248,7 @@ final class FrontMatterParser
 
     private function url(Fields $fields, string $key): ?string
     {
-        $url = $fields->nonEmptyString($key);
+        $url = $fields->trimmedString($key);
         if ($url !== null && ! HttpUrl::isValid($url)) {
             $fields->fail('expected an absolute http(s) URL, got "'.$url.'".', $key);
         }
@@ -258,7 +258,7 @@ final class FrontMatterParser
 
     private function image(Fields $fields): ?string
     {
-        $image = $fields->nonEmptyString('image');
+        $image = $fields->trimmedString('image');
         if ($image === null) {
             return null;
         }

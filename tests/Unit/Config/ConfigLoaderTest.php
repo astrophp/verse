@@ -172,6 +172,29 @@ final class ConfigLoaderTest extends TestCase
     }
 
     #[Test]
+    public function urls_lose_surrounding_whitespace_such_as_a_block_scalar_newline(): void
+    {
+        $config = $this->parse(<<<'YAML'
+            title: x
+            url: |
+              https://example.test/notes/
+            author:
+              name: Jane
+              url: " https://jane.example.net/ "
+            social_links:
+              github: |
+                https://github.com/jane
+              email: "mailto:me@example.test "
+            YAML, requireUrl: true);
+
+        $this->assertNotNull($config->url);
+        $this->assertSame('https://example.test', $config->url->origin);
+        $this->assertSame('/notes/', $config->url->basePath);
+        $this->assertSame('https://jane.example.net/', $config->author?->url);
+        $this->assertSame(['https://github.com/jane', 'mailto:me@example.test'], array_map(static fn ($link) => $link->url, $config->socialLinks));
+    }
+
+    #[Test]
     #[DataProvider('validUrls')]
     public function it_normalizes_the_url(string $input, string $origin, string $basePath, string $full): void
     {

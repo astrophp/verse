@@ -117,6 +117,8 @@ final class ThemeSettingsResolverTest extends TestCase
         // explicit values replace them
         $own = $this->resolve("theme:\n  logo: https://example.test/own.svg\n", $registry);
         $this->assertSame('https://example.test/own.svg', $own->logo);
+        $block = $this->resolve("theme:\n  logo: |\n    https://example.test/own.svg\n", $registry);
+        $this->assertSame('https://example.test/own.svg', $block->logo);
 
         // explicit null clears them
         $cleared = $this->resolve("theme:\n  logo: ~\n  accent: ~\n", $registry);

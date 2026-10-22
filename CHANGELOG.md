@@ -16,6 +16,12 @@ commands, configuration keys, theme views and output.
 - Builds are faster: the default theme renders its pages without Blade components, so each page
   needs far fewer template renders. The generated HTML is unchanged.
 
+### Fixed
+
+- URLs in `verse.yaml` and front matter lose surrounding whitespace, such as the trailing newline a
+  YAML block scalar (`canonical: |`) keeps, instead of carrying it into `<link rel="canonical">`,
+  the sitemap or a link.
+
 ## v0.3.0 - 2026-10-21
 
 ### Added
