@@ -9,7 +9,6 @@ use Astro\Verse\Error\VerseException;
 use Astro\Verse\Markdown\RenderedMarkdown;
 use Astro\Verse\Routing\RouteResolver;
 use Astro\Verse\Site\Articles;
-use Astro\Verse\Site\ItemSorter;
 use Astro\Verse\Site\ListingPage;
 use Astro\Verse\Site\Page;
 use Astro\Verse\Site\PageRole;
@@ -78,9 +77,9 @@ final class SiteRenderer
         foreach ($articles->listing->pages as $page) {
             yield RouteResolver::outputPath($page->route) => $this->listing($articles, $page);
         }
-        foreach ($articles->items as $item) {
+        foreach ($articles->items as $index => $item) {
             if ($item->route !== null) {
-                yield RouteResolver::outputPath($item->route) => $this->article($articles, $item);
+                yield RouteResolver::outputPath($item->route) => $this->article($articles, $item, $articles->items[$index + 1] ?? null);
             }
         }
 
@@ -192,7 +191,7 @@ final class SiteRenderer
         ], articles: $articles);
     }
 
-    private function article(Articles $articles, Page $page): string
+    private function article(Articles $articles, Page $page, ?Page $older): string
     {
         $route = (string) $page->route;
         $body = $this->body($page);
@@ -221,7 +220,7 @@ final class SiteRenderer
             end: $this->isOffSite($page->meta->canonical)
                 ? new Link('Read the original', (string) $page->meta->canonical, external: true)
                 : new Link('Back to '.$name, $this->context->url(Articles::ROUTE)),
-            related: $this->related($articles, $page),
+            related: $this->olderLink($older),
         );
 
         $layout = $this->layouts->build(
@@ -249,26 +248,17 @@ final class SiteRenderer
     }
 
     /**
-     * The next older article (external articles link out).
+     * The link to the next older article (external articles link out).
      */
-    private function related(Articles $articles, Page $page): ?Link
+    private function olderLink(?Page $older): ?Link
     {
-        $items = ItemSorter::newestFirst($articles->items);
-        foreach ($items as $index => $item) {
-            if ($item === $page) {
-                $next = $items[$index + 1] ?? null;
-
-                return $next === null
-                    ? null
-                    : new Link(
-                        $next->meta->title,
-                        $next->route === null ? (string) $next->meta->externalUrl : $this->context->url($next->route),
-                        external: $next->route === null,
-                    );
-            }
-        }
-
-        return null;
+        return $older === null
+            ? null
+            : new Link(
+                $older->meta->title,
+                $older->route === null ? (string) $older->meta->externalUrl : $this->context->url($older->route),
+                external: $older->route === null,
+            );
     }
 
     private function isOffSite(?string $canonical): bool
