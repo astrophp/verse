@@ -13,6 +13,8 @@ commands, configuration keys, theme views and output.
   is found in one pass instead of re-sorting every article for each article.
 - Builds are faster: the Markdown parser is set up once per build instead of once for every
   Markdown file.
+- Builds are faster: the default theme renders its pages without Blade components, so each page
+  needs far fewer template renders. The generated HTML is unchanged.
 
 ## v0.3.0 - 2026-10-21
 
