@@ -82,6 +82,17 @@ final class Fields
         return $value;
     }
 
+    /**
+     * A non-empty string without its surrounding whitespace, for values such as URLs where it is never meant:
+     * a YAML block scalar (`url: |`) keeps a trailing newline, and a quoted value can keep stray spaces.
+     */
+    public function trimmedString(string $key): ?string
+    {
+        $value = $this->nonEmptyString($key);
+
+        return $value === null ? null : trim($value);
+    }
+
     public function requiredString(string $key): string
     {
         if (! $this->has($key)) {

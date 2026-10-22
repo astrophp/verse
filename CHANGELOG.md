@@ -14,6 +14,12 @@ commands, configuration keys, theme views and output.
 - Builds are faster: the Markdown parser is set up once per build instead of once for every
   Markdown file.
 
+### Fixed
+
+- URLs in `verse.yaml` and front matter lose surrounding whitespace, such as the trailing newline a
+  YAML block scalar (`canonical: |`) keeps, instead of carrying it into `<link rel="canonical">`,
+  the sitemap or a link.
+
 ## v0.3.0 - 2026-10-21
 
 ### Added

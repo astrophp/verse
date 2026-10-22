@@ -7,11 +7,12 @@ namespace Astro\Verse\Support;
 final class HttpUrl
 {
     /**
-     * An absolute http(s) URL with a valid authority and no whitespace or control characters.
+     * An absolute http(s) URL with a valid authority and no whitespace or control characters, not even a
+     * trailing newline. Readers trim the surrounding whitespace first (Fields::trimmedString).
      */
     public static function isValid(string $value): bool
     {
-        if (preg_match('~^https?://([^/?#]*)([^\s\x00-\x1f\x7f]*)$~iu', $value, $m) !== 1) {
+        if (preg_match('~^https?://([^/?#]*)([^\s\x00-\x1f\x7f]*)$~iuD', $value, $m) !== 1) {
             return false;
         }
 
@@ -25,7 +26,7 @@ final class HttpUrl
     public static function isValidAuthority(string $authority): bool
     {
         $label = '[\p{L}\p{N}](?:[\p{L}\p{N}-]*[\p{L}\p{N}])?';
-        if (preg_match('/^('.$label.'(?:\.'.$label.')*)(?::(\d{1,5}))?$/u', $authority, $m) !== 1) {
+        if (preg_match('/^('.$label.'(?:\.'.$label.')*)(?::(\d{1,5}))?$/uD', $authority, $m) !== 1) {
             return false;
         }
 

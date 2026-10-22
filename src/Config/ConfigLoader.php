@@ -103,7 +103,7 @@ final class ConfigLoader
 
     private function url(Fields $fields): SiteUrl
     {
-        $raw = $fields->nonEmptyString('url') ?? '';
+        $raw = $fields->trimmedString('url') ?? '';
         $hint = ' Expected an http(s) origin with an optional directory base path, e.g. https://example.com/ or https://example.com/notes/.';
 
         if (preg_match('/[\s\x00-\x1f\x7f\\\\]/u', $raw) === 1) {
@@ -160,7 +160,7 @@ final class ConfigLoader
 
         $author->rejectUnknown(['name', 'url', 'email']);
 
-        $url = $author->nonEmptyString('url');
+        $url = $author->trimmedString('url');
         if ($url !== null && ! HttpUrl::isValid($url)) {
             $author->fail('expected an absolute http(s) URL, got "'.$url.'".', 'url');
         }
@@ -185,6 +185,7 @@ final class ConfigLoader
         $links = [];
         foreach ($map as $key => $value) {
             $key = (string) $key;
+            $value = is_string($value) ? trim($value) : $value;
             if (! is_string($value) || ! $this->isLinkTarget($value)) {
                 $fields->fail(
                     'expected an absolute http(s) URL or a mailto: address, got '.Fields::describe($value).'.',
@@ -228,7 +229,7 @@ final class ConfigLoader
     private function isLinkTarget(string $value): bool
     {
         if (str_starts_with(strtolower($value), 'mailto:')) {
-            return preg_match('/^mailto:[^\s]+$/i', $value) === 1;
+            return preg_match('/^mailto:[^\s]+$/iD', $value) === 1;
         }
 
         return HttpUrl::isValid($value);

@@ -89,6 +89,23 @@ final class FrontMatterParserTest extends TestCase
     }
 
     #[Test]
+    public function urls_lose_surrounding_whitespace_such_as_a_block_scalar_newline(): void
+    {
+        $meta = $this->parse(<<<'YAML'
+            title: x
+            date: 2026-10-15
+            canonical: |
+              https://elsewhere.test/post
+            image: "  https://elsewhere.test/cover.png  "
+            YAML)->frontMatter;
+        $this->assertSame('https://elsewhere.test/post', $meta->canonical);
+        $this->assertSame('https://elsewhere.test/cover.png', $meta->image);
+
+        $external = $this->parse("title: x\ndate: 2026-10-15\nexternal_url: >\n  https://elsewhere.test/out\n")->frontMatter;
+        $this->assertSame('https://elsewhere.test/out', $external->externalUrl);
+    }
+
+    #[Test]
     public function it_strips_a_bom_and_normalizes_crlf(): void
     {
         $document = (new FrontMatterParser)->parse("\u{FEFF}---\r\ntitle: Win\r\ndate: 2026-10-15\r\n---\r\nLine one\r\nLine two\r\n", self::PATH, new DateTimeZone('UTC'));
