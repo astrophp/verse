@@ -1,7 +1,8 @@
 @extends('verse::layouts.base')
 @section('content')
 <div class="article-page">
-<div class="article-back"><x-back-link :link="$article->back" /></div>
+<div class="article-back"><a class="back-link" href="{{ trim($article->back->url) }}">{!! $__verse->icon('left-arrow', 'small') !!}<span>{{ $article->back->label }}</span></a>
+</div>
 <header class="article-header">
 <h1>{{ $article->title }}</h1>
 @if ($article->description !== null)
@@ -16,7 +17,13 @@
 @endif
 <span>{{ $article->readingMinutes }} min read</span>
 @if ($article->tags !== [])
-<span class="separator">/</span><span class="article-topic"><x-tag-links :tags="$article->tags" /></span>
+<span class="separator">/</span><span class="article-topic">@foreach ($article->tags as $tag)
+@if ($tag->url !== null)
+<a class="tag-link" href="{{ $tag->url }}"@if ($tag->current) aria-current="true"@endif>{{ $tag->label }}</a>
+@else
+<span>{{ $tag->label }}</span>
+@endif
+@endforeach</span>
 @endif
 </div>
 </header>
@@ -32,7 +39,8 @@
 <article class="prose" aria-label="Article content">
 {!! $article->bodyHtml !!}
 </article>
-<div class="article-end"><x-text-link :link="$article->end" /></div>
+<div class="article-end"><a class="text-link" href="{{ trim($article->end->url) }}"@if ($article->end->external) target="_blank" rel="noopener noreferrer"@endif><span>{{ $article->end->label }}</span>{!! $__verse->icon($article->end->external ? 'up-right' : 'arrow', $article->end->external ? 'small' : '') !!}</a>
+</div>
 @if ($article->related !== null)
 <div class="related-article"><div class="small-label">Keep reading</div><a href="{{ $article->related->url }}"@if ($article->related->external) target="_blank" rel="noopener noreferrer"@endif><span>{{ $article->related->label }}</span>{!! $__verse->icon($article->related->external ? 'up-right' : 'arrow') !!}</a></div>
 @endif
