@@ -7,6 +7,11 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+### Changed
+
+- Builds of websites with many articles are faster: the "Keep reading" link to the next older article
+  is found in one pass instead of re-sorting every article for each article.
+
 ## v0.3.0 - 2026-10-21
 
 ### Added
