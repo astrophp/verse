@@ -7,6 +7,8 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+## v0.3.1 - 2026-10-22
+
 ### Changed
 
 - Builds of websites with many articles are faster: the "Keep reading" link to the next older article
