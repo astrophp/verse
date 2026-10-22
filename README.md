@@ -35,8 +35,8 @@ Markdown files with YAML front matter and one `verse.yaml`; Verse renders it thr
 theme into plain static HTML, CSS and JavaScript that any static host can serve.
 
 > [!WARNING]
-> Verse is early software (v0.2). Until v1.0.0, a minor version may change commands, configuration
-> keys, theme views and output; the [changelog](CHANGELOG.md) lists every change.
+> Verse is early software. Until v1.0.0, a minor version may change commands, configuration keys,
+> theme views and output; the [changelog](CHANGELOG.md) lists every change.
 
 - Four commands: `verse init`, `verse serve`, `verse check`, `verse build`.
 - Articles, pages, page bundles with attachments, tags, drafts and scheduled posts, external articles.
