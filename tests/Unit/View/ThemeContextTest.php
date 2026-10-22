@@ -50,6 +50,35 @@ final class ThemeContextTest extends TestCase
     }
 
     #[Test]
+    public function inline_reads_a_file_once_per_context(): void
+    {
+        $theme = $this->themeRegistry([
+            'paper/theme.yaml' => "name: paper\nentries: [a.css]\n",
+            'paper/src/head.js' => "  first();\n",
+        ])->find('paper');
+        $site = $this->loadSite(['verse.yaml' => "title: T\n"]);
+        $manifest = ViteManifest::load(ThemeRegistry::bundled()->find('default'));
+        $context = new ThemeContext($site, $theme, $manifest);
+
+        $this->assertSame('first();', $context->inline('src/head.js'));
+        file_put_contents($theme->root.'/src/head.js', "second();\n");
+        $this->assertSame('first();', $context->inline('src/head.js'));
+
+        // a new build has a new context, which reads the file again
+        $this->assertSame('second();', (new ThemeContext($site, $theme, $manifest))->inline('src/head.js'));
+
+        // a refused path is not remembered: it fails on every call
+        foreach ([1, 2] as $attempt) {
+            try {
+                $context->inline('src/missing.js');
+                $this->fail('Expected a ThemeException on attempt '.$attempt);
+            } catch (ThemeException $exception) {
+                $this->assertStringContainsString('inside the theme folder', $exception->getMessage());
+            }
+        }
+    }
+
+    #[Test]
     public function icons_are_known_or_a_theme_error(): void
     {
         $context = $this->context();

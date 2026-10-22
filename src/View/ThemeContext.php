@@ -44,6 +44,9 @@ final class ThemeContext
     /** @var array<string, IntlDateFormatter> */
     private array $formatters = [];
 
+    /** @var array<string, string> inlined file contents by the path the view asked for; a context lives for one build */
+    private array $inlineFilesCache = [];
+
     public function __construct(
         private readonly SiteModel $site,
         private readonly Theme $theme,
@@ -88,12 +91,19 @@ final class ThemeContext
     }
 
     /**
-     * The contents of a file inside the theme directory, for inlining into a layout.
+     * The contents of a file inside the theme directory, for inlining into a layout. Each file is read once per
+     * build; later calls with the same path return the remembered contents.
+     *
+     * @phpstan-impure it reads the filesystem
      *
      * @throws ThemeException when the path leaves the theme or does not exist
      */
     public function inline(string $themeRelativePath): string
     {
+        if (isset($this->inlineFilesCache[$themeRelativePath])) {
+            return $this->inlineFilesCache[$themeRelativePath];
+        }
+
         $root = realpath($this->theme->root);
         $file = $root === false ? false : realpath($root.'/'.$themeRelativePath);
         if ($root === false || $file === false || ! str_starts_with($file, $root.'/') || ! is_file($file)) {
@@ -108,7 +118,7 @@ final class ThemeContext
             throw new ThemeException('cannot read "'.$themeRelativePath.'" to inline it.', 'themes/'.$this->theme->name);
         }
 
-        return trim($contents);
+        return $this->inlineFilesCache[$themeRelativePath] = trim($contents);
     }
 
     /**

@@ -7,6 +7,11 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+### Changed
+
+- Builds are faster on large websites: the default theme's inlined theme script is read once per
+  build instead of once for every page.
+
 ## v0.3.1 - 2026-10-22
 
 ### Changed
