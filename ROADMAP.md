@@ -39,6 +39,7 @@ application, a CMS or a hosted service.
 
 ## Next
 
+- Hooks: a website adds its own markup to every page from `theme/hooks/`.
 - An RSS feed and `robots.txt`.
 - Broken-link and heading-anchor validation of the built output.
 - Structured data in page metadata.
@@ -48,7 +49,7 @@ application, a CMS or a hosted service.
 These are ideas, not promises.
 
 - A PHAR, for installing without Composer.
-- Overriding single theme views and adding a site stylesheet from the website folder.
+- Overriding single theme views (`theme/views/`) and adding a site stylesheet from the website folder.
 - More bundled themes.
 - Redirects, image processing and multilingual content.
 

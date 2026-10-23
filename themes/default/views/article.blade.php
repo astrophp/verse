@@ -36,9 +36,11 @@
 @endforeach
 </nav></details>
 @endif
+@verseHook('article-before')
 <article class="prose" aria-label="Article content">
 {!! $article->bodyHtml !!}
 </article>
+@verseHook('article-after')
 <div class="article-end"><a class="text-link" href="{{ trim($article->end->url) }}"@if ($article->end->external) target="_blank" rel="noopener noreferrer"@endif><span>{{ $article->end->label }}</span>{!! verse()->icon($article->end->external ? 'up-right' : 'arrow', $article->end->external ? 'small' : '') !!}</a>
 </div>
 @if ($article->related !== null)

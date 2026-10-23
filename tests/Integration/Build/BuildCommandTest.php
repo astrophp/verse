@@ -98,7 +98,7 @@ final class BuildCommandTest extends TestCase
     {
         $root = $this->fixtureSite('notes', [
             'verse.yaml' => "title: Site\nurl: https://example.com/\nauthor: Your Name\nsocial_links:\n  github: https://github.com/your-username\n",
-            'theme/theme.yaml' => "name: x\n",
+            'themes/paper/theme.yaml' => "name: x\n",
         ]);
         $tester = $this->runBuild($root);
 
@@ -106,7 +106,7 @@ final class BuildCommandTest extends TestCase
         $errors = $tester->getErrorOutput();
         $this->assertSame(4, substr_count($errors, 'warning: '));
         $this->assertStringContainsString('warning: verse.yaml: url uses the placeholder host "example.com"', $errors);
-        $this->assertStringContainsString('warning: site themes are not supported in this version; the theme/ directory is ignored', $errors);
+        $this->assertStringContainsString('warning: site themes are not supported in this version; the themes/ directory is ignored', $errors);
         $this->assertStringContainsString('Built ', $tester->getDisplay());
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Astro\Verse\View;
 
 use Astro\Verse\Assets\ViteManifest;
+use Astro\Verse\Build\BuildMode;
 use Astro\Verse\Error\ThemeException;
 use Astro\Verse\Routing\UrlGenerator;
 use Astro\Verse\Site\MenuItem;
@@ -56,6 +57,14 @@ final class ThemeContext
         $config = $site->context->config;
         $this->timezone = $config->dateTimeZone();
         $this->locale = Locale::canonicalize($config->language) ?: 'en';
+    }
+
+    /**
+     * Whether the site renders for `verse serve`; `verse build` and `verse check` are production.
+     */
+    public function isPreview(): bool
+    {
+        return $this->site->context->mode === BuildMode::Preview;
     }
 
     /**

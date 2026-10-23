@@ -52,6 +52,7 @@ final class SiteRenderer
         private readonly Theme $theme,
         private readonly ThemeContext $context,
         private readonly string $cachePath,
+        private readonly ?string $hooksPath = null,
     ) {
         $this->markdown = new SiteMarkdown($site);
         $this->layouts = new LayoutBuilder($site, $context);
@@ -63,7 +64,7 @@ final class SiteRenderer
      */
     public function render(): Generator
     {
-        $this->views = BladeFactory::create($this->theme->viewsPath, $this->cachePath);
+        $this->views = BladeFactory::create($this->theme->viewsPath, $this->cachePath, $this->hooksPath);
         $container = Container::getInstance();
         $container->instance(ThemeContext::class, $this->context);
         try {
