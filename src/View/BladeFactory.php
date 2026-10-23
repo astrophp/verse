@@ -59,7 +59,7 @@ final class BladeFactory
         $container->instance('blade.compiler', $compiler);
         $container->instance(BladeCompiler::class, $compiler);
 
-        $compiler->directive('verseAssets', static fn (): string => '<?php echo $__verse->assetTags(); ?>');
+        $compiler->directive('verseAssets', static fn (): string => '<?php echo verse()->assetTags(); ?>');
 
         foreach (self::componentNames($viewsPath.'/components') as $name) {
             $compiler->component(self::NAMESPACE.'::components.'.$name, $name);

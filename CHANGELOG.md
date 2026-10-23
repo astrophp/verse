@@ -7,6 +7,11 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+### Changed
+
+- Theme views call the `verse()` helper (`verse()->url('/articles/')`) instead of the `$__verse`
+  variable, which is gone.
+
 ## v0.3.2 - 2026-10-22
 
 ### Changed

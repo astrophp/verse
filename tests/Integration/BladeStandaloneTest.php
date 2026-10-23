@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Astro\Verse\Tests\Integration;
 
+use Astro\Verse\Assets\ViteManifest;
+use Astro\Verse\Error\ThemeException;
+use Astro\Verse\Tests\Support\TestCase;
+use Astro\Verse\Theme\ThemeRegistry;
 use Astro\Verse\View\BladeFactory;
+use Astro\Verse\View\ThemeContext;
+use Illuminate\Container\Container;
 use Illuminate\View\Factory;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Standalone Blade (no Laravel application) renders layouts, sections,
- * anonymous components, a custom directive and shared data from an unrelated
- * working directory, twice in one process.
+ * anonymous components, a custom directive and the `verse()` helper from an
+ * unrelated working directory, twice in one process.
  */
 final class BladeStandaloneTest extends TestCase
 {
@@ -31,24 +36,25 @@ final class BladeStandaloneTest extends TestCase
     protected function tearDown(): void
     {
         chdir($this->previousCwd);
-        $this->removeTree($this->workDir);
+        self::removeTree($this->workDir);
+        parent::tearDown();
     }
 
     #[Test]
     public function it_renders_layout_sections_and_components_from_an_unrelated_directory(): void
     {
-        $html = $this->render($this->factory('cache-a', 'A'));
+        $html = $this->render($this->factory('cache-a', 'a'), 'a');
 
-        $this->assertStringContainsString('<title>Page A - Fixture</title>', $html);
-        $this->assertStringContainsString('<link rel="stylesheet" href="/assets/theme/app-A.css">', $html);
-        $this->assertStringContainsString('<script type="module" src="/assets/theme/app-A.js"></script>', $html);
+        $this->assertStringContainsString('<title>Page a - Fixture</title>', $html);
+        $this->assertStringContainsString('<link rel="stylesheet" href="/a/assets/theme/app-', $html);
+        $this->assertStringContainsString('<script type="module" src="/a/assets/theme/app-', $html);
         $this->assertStringContainsString('<footer>Custom footer</footer>', str_replace("\n", '', $html));
     }
 
     #[Test]
     public function it_applies_props_slots_attributes_and_nested_components(): void
     {
-        $html = $this->render($this->factory('cache-a', 'A'));
+        $html = $this->render($this->factory('cache-a', 'a'), 'a');
 
         // props + escaping of the prop value
         $this->assertStringContainsString('<h2>Escaped &amp;amp; &lt;b&gt;</h2>', $html);
@@ -71,53 +77,50 @@ final class BladeStandaloneTest extends TestCase
     #[Test]
     public function it_renders_again_with_a_second_factory_and_cache_directory_in_one_process(): void
     {
-        $first = $this->render($this->factory('cache-a', 'A'));
-        $second = $this->render($this->factory('cache-b', 'B'));
-        $again = $this->render($this->factory('cache-a', 'A'));
+        $first = $this->render($this->factory('cache-a', 'a'), 'a');
+        $second = $this->render($this->factory('cache-b', 'b'), 'b');
+        $again = $this->render($this->factory('cache-a', 'a'), 'a');
 
-        $this->assertStringContainsString('app-A.css', $first);
-        $this->assertStringNotContainsString('app-B.css', $first);
-        $this->assertStringContainsString('app-B.css', $second);
-        $this->assertStringNotContainsString('app-A.css', $second);
+        $this->assertStringContainsString('/a/assets/theme/', $first);
+        $this->assertStringNotContainsString('/b/assets/theme/', $first);
+        $this->assertStringContainsString('/b/assets/theme/', $second);
+        $this->assertStringNotContainsString('/a/assets/theme/', $second);
         $this->assertSame($first, $again);
 
         $this->assertNotSame([], glob($this->workDir.'/cache-a/*.php'));
         $this->assertNotSame([], glob($this->workDir.'/cache-b/*.php'));
     }
 
-    private function factory(string $cacheDir, string $tag): Factory
+    #[Test]
+    public function verse_outside_a_render_names_the_problem(): void
+    {
+        Container::setInstance(new Container);
+
+        $this->expectException(ThemeException::class);
+        $this->expectExceptionMessage('verse() is only available while Verse renders a theme view.');
+
+        verse();
+    }
+
+    /**
+     * A factory whose `verse()` is a real theme context for a site under the base path `/<base>/`.
+     */
+    private function factory(string $cacheDir, string $base): Factory
     {
         $factory = BladeFactory::create(__DIR__.'/../Fixtures/views', $this->workDir.'/'.$cacheDir);
-        $factory->share('__verse', new FixtureThemeContext($tag));
+        $site = $this->loadSite(['verse.yaml' => "title: T\nurl: https://example.test/{$base}/\n"]);
+        $theme = ThemeRegistry::bundled()->find('default');
+        Container::getInstance()->instance(ThemeContext::class, new ThemeContext($site, $theme, ViteManifest::load($theme)));
 
         return $factory;
     }
 
-    private function render(Factory $factory): string
+    private function render(Factory $factory, string $title): string
     {
-        $tag = $factory->shared('__verse');
-        $this->assertInstanceOf(FixtureThemeContext::class, $tag);
-
         return $factory->make('verse::page', [
-            'title' => 'Page '.$tag->tag,
+            'title' => 'Page '.$title,
             'untrusted' => '<script>alert(1)</script>',
             'trusted' => '<em>trusted</em>',
         ])->render();
-    }
-
-    private function removeTree(string $path): void
-    {
-        if (! is_dir($path)) {
-            return;
-        }
-
-        foreach (scandir($path) ?: [] as $entry) {
-            if ($entry === '.' || $entry === '..') {
-                continue;
-            }
-            $child = $path.'/'.$entry;
-            is_dir($child) && ! is_link($child) ? $this->removeTree($child) : unlink($child);
-        }
-        rmdir($path);
     }
 }

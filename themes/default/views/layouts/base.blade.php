@@ -25,7 +25,7 @@
 <meta name="robots" content="noindex">
 @endif
 <link rel="icon" href="{{ $layout->iconUrl ?? $layout->monogramIcon }}">
-<script>{!! $__verse->inline('src/head-theme.js') !!}</script>
+<script>{!! verse()->inline('src/head-theme.js') !!}</script>
 @verseAssets
 @if ($layout->accentCss !== null)
 <style>{!! $layout->accentCss !!}</style>
@@ -40,10 +40,10 @@
 @foreach ($layout->nav as $item)
       <a class="nav-link" href="{{ $item->url }}"@if ($item->current) aria-current="page"@endif>{{ $item->label }}</a>
 @endforeach
-      <button class="search-button" type="button" aria-label="Search" title="Search (Ctrl or ⌘ K)" data-open-search data-search-index="{{ $__verse->asset('search.json') }}" hidden>{!! $__verse->icon('search') !!}</button>
-      <div class="theme-menu"><button class="header-theme" type="button" id="theme-button" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-options" aria-label="Color theme: System" title="Color theme" hidden>{!! $__verse->icon('theme-system') !!}</button><div class="theme-options" id="theme-options" role="menu" aria-label="Color theme" hidden>
+      <button class="search-button" type="button" aria-label="Search" title="Search (Ctrl or ⌘ K)" data-open-search data-search-index="{{ verse()->asset('search.json') }}" hidden>{!! verse()->icon('search') !!}</button>
+      <div class="theme-menu"><button class="header-theme" type="button" id="theme-button" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-options" aria-label="Color theme: System" title="Color theme" hidden>{!! verse()->icon('theme-system') !!}</button><div class="theme-options" id="theme-options" role="menu" aria-label="Color theme" hidden>
 @foreach (['light' => 'Light', 'dark' => 'Dark', 'system' => 'System'] as $option => $label)
-<button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="{{ $option }}" tabindex="-1">{!! $__verse->icon('theme-'.$option) !!}<span>{{ $label }}</span>{!! $__verse->icon('check', 'small theme-check') !!}</button>
+<button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="{{ $option }}" tabindex="-1">{!! verse()->icon('theme-'.$option) !!}<span>{{ $label }}</span>{!! verse()->icon('check', 'small theme-check') !!}</button>
 @endforeach
 </div></div>
     </nav>

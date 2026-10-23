@@ -23,6 +23,7 @@ use Astro\Verse\View\Model\Link;
 use Astro\Verse\View\Model\TagRow;
 use Astro\Verse\View\Model\TocEntry;
 use Generator;
+use Illuminate\Container\Container;
 use Illuminate\View\Factory;
 use Throwable;
 
@@ -63,7 +64,21 @@ final class SiteRenderer
     public function render(): Generator
     {
         $this->views = BladeFactory::create($this->theme->viewsPath, $this->cachePath);
-        $this->views->share('__verse', $this->context);
+        $container = Container::getInstance();
+        $container->instance(ThemeContext::class, $this->context);
+        try {
+            yield from $this->pages();
+        } finally {
+            // verse() works only while this site renders
+            $container->forgetInstance(ThemeContext::class);
+        }
+    }
+
+    /**
+     * @return Generator<string, string>
+     */
+    private function pages(): Generator
+    {
 
         yield 'index.html' => $this->home();
 
@@ -317,7 +332,7 @@ final class SiteRenderer
     /**
      * Renders a role view. Besides the role's own view models every view receives the whole context:
      * `$site` (the configuration), `$theme` (resolved settings), `$page` (null for generated
-     * pages), `$articles` (null for pages and the 404 page) and `$menu`; `$__verse` is shared.
+     * pages), `$articles` (null for pages and the 404 page) and `$menu`; `verse()` is the theme helper.
      *
      * @param  array<string, mixed>  $data
      */

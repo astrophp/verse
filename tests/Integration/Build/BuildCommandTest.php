@@ -188,7 +188,7 @@ final class BuildCommandTest extends TestCase
     {
         $root = $this->fixtureSite();
         $themes = $this->themeRegistry(ThemeSelectionTest::paperWith([
-            'paper/views/layouts/base.blade.php' => '<html><head><script>{!! $__verse->inline(\'src/missing.js\') !!}</script></head><body>@yield(\'content\')</body></html>',
+            'paper/views/layouts/base.blade.php' => '<html><head><script>{!! verse()->inline(\'src/missing.js\') !!}</script></head><body>@yield(\'content\')</body></html>',
         ]));
         $this->writeFiles($root, ['verse.yaml' => (string) file_get_contents($root.'/verse.yaml')."theme:\n  name: paper\n"]);
 
