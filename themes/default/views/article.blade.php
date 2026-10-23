@@ -1,7 +1,7 @@
 @extends('verse::layouts.base')
 @section('content')
 <div class="article-page">
-<div class="article-back"><a class="back-link" href="{{ trim($article->back->url) }}">{!! $__verse->icon('left-arrow', 'small') !!}<span>{{ $article->back->label }}</span></a>
+<div class="article-back"><a class="back-link" href="{{ trim($article->back->url) }}">{!! verse()->icon('left-arrow', 'small') !!}<span>{{ $article->back->label }}</span></a>
 </div>
 <header class="article-header">
 <h1>{{ $article->title }}</h1>
@@ -39,10 +39,10 @@
 <article class="prose" aria-label="Article content">
 {!! $article->bodyHtml !!}
 </article>
-<div class="article-end"><a class="text-link" href="{{ trim($article->end->url) }}"@if ($article->end->external) target="_blank" rel="noopener noreferrer"@endif><span>{{ $article->end->label }}</span>{!! $__verse->icon($article->end->external ? 'up-right' : 'arrow', $article->end->external ? 'small' : '') !!}</a>
+<div class="article-end"><a class="text-link" href="{{ trim($article->end->url) }}"@if ($article->end->external) target="_blank" rel="noopener noreferrer"@endif><span>{{ $article->end->label }}</span>{!! verse()->icon($article->end->external ? 'up-right' : 'arrow', $article->end->external ? 'small' : '') !!}</a>
 </div>
 @if ($article->related !== null)
-<div class="related-article"><div class="small-label">Keep reading</div><a href="{{ $article->related->url }}"@if ($article->related->external) target="_blank" rel="noopener noreferrer"@endif><span>{{ $article->related->label }}</span>{!! $__verse->icon($article->related->external ? 'up-right' : 'arrow') !!}</a></div>
+<div class="related-article"><div class="small-label">Keep reading</div><a href="{{ $article->related->url }}"@if ($article->related->external) target="_blank" rel="noopener noreferrer"@endif><span>{{ $article->related->label }}</span>{!! verse()->icon($article->related->external ? 'up-right' : 'arrow') !!}</a></div>
 @endif
 </div>
 @if ($article->toc !== [])

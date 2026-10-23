@@ -17,7 +17,7 @@ use IntlDateFormatter;
 use Locale;
 
 /**
- * The `$__verse` helper shared with every view: URLs, asset tags, inlined theme files, icons, dates and menu
+ * The `verse()` helper of every view: URLs, asset tags, inlined theme files, icons, dates and menu
  * state. Everything it prints unescaped (asset tags, icons, inlined files) comes from the theme itself,
  * never from site content.
  */

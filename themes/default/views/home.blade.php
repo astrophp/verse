@@ -30,7 +30,7 @@
 <article class="timeline-item"><div class="timeline-entry">
 <div class="timeline-meta"><time datetime="{{ $entry->isoDate }}">{{ $entry->dateLabel }}</time>@if ($entry->stateLabel !== null)<span class="state-badge">{{ $entry->stateLabel }}</span>@endif</div>
 <a href="{{ $entry->url }}" class="timeline-article"@if ($entry->external) target="_blank" rel="noopener noreferrer"@endif>
-<div class="timeline-title-row"><h2>{{ $entry->title }}</h2><span class="timeline-arrow">{!! $__verse->icon($entry->external ? 'up-right' : 'arrow') !!}</span></div>
+<div class="timeline-title-row"><h2>{{ $entry->title }}</h2><span class="timeline-arrow">{!! verse()->icon($entry->external ? 'up-right' : 'arrow') !!}</span></div>
 @if ($entry->description !== null)
 <p>{{ $entry->description }}</p>
 @endif
@@ -58,18 +58,18 @@
 @if ($archive->pagination !== null)
 <nav class="pagination" aria-label="Pagination">
 @if ($archive->pagination->newer !== null)
-<a class="text-link" href="{{ trim($archive->pagination->newer->url) }}" rel="prev">{!! $__verse->icon('left-arrow') !!}<span>{{ $archive->pagination->newer->label }}</span></a>
+<a class="text-link" href="{{ trim($archive->pagination->newer->url) }}" rel="prev">{!! verse()->icon('left-arrow') !!}<span>{{ $archive->pagination->newer->label }}</span></a>
 @else
 <span class="pagination-disabled">Newer</span>
 @endif
 <span class="pagination-status">{{ $archive->pagination->status }}</span>
 @if ($archive->pagination->older !== null)
-<a class="text-link" href="{{ trim($archive->pagination->older->url) }}" rel="next"><span>{{ $archive->pagination->older->label }}</span>{!! $__verse->icon('arrow', '') !!}</a>
+<a class="text-link" href="{{ trim($archive->pagination->older->url) }}" rel="next"><span>{{ $archive->pagination->older->label }}</span>{!! verse()->icon('arrow', '') !!}</a>
 @else
 <span class="pagination-disabled">Older</span>
 @endif
 </nav>
 @endif
-<div class="archive-more"><a class="button-link" href="{{ $all->url }}">{{ $all->label }} {!! $__verse->icon('arrow') !!}</a></div>
+<div class="archive-more"><a class="button-link" href="{{ $all->url }}">{{ $all->label }} {!! verse()->icon('arrow') !!}</a></div>
 </div>
 @endsection
