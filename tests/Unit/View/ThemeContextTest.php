@@ -34,6 +34,17 @@ final class ThemeContextTest extends TestCase
     }
 
     #[Test]
+    public function only_a_preview_build_is_a_preview(): void
+    {
+        $theme = ThemeRegistry::bundled()->find('default');
+        $production = new ThemeContext($this->loadSite([]), $theme, ViteManifest::load($theme));
+        $preview = new ThemeContext($this->loadSite([], drafts: true), $theme, ViteManifest::load($theme));
+
+        $this->assertFalse($production->isPreview());
+        $this->assertTrue($preview->isPreview());
+    }
+
+    #[Test]
     public function inline_reads_theme_files_and_refuses_to_leave_the_theme(): void
     {
         $context = $this->context();

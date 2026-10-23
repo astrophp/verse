@@ -57,40 +57,23 @@ final class SiteWarningsTest extends TestCase
     }
 
     #[Test]
-    public function it_warns_about_a_site_theme_directory(): void
+    public function it_warns_about_a_themes_directory(): void
     {
-        $with = $this->makeSite(['theme/views/x.blade.php' => '']);
+        $with = $this->makeSite(['themes/paper/views/x.blade.php' => '']);
         $without = $this->makeSite(['verse.yaml' => 'title: x']);
 
         $this->assertSame(
-            ['site themes are not supported in this version; the theme/ directory is ignored'],
+            ['site themes are not supported in this version; the themes/ directory is ignored'],
             SiteWarnings::themeDirectory($with),
         );
         $this->assertSame([], SiteWarnings::themeDirectory($without));
     }
 
     #[Test]
-    public function it_warns_about_a_themes_directory(): void
+    public function it_no_longer_warns_about_a_theme_directory(): void
     {
-        $root = $this->makeSite(['themes/paper/views/x.blade.php' => '']);
+        $root = $this->makeSite(['theme/hooks/head.blade.php' => '']);
 
-        $this->assertSame(
-            ['site themes are not supported in this version; the themes/ directory is ignored'],
-            SiteWarnings::themeDirectory($root),
-        );
-    }
-
-    #[Test]
-    public function it_warns_once_per_directory_when_both_exist(): void
-    {
-        $root = $this->makeSite(['theme/a.txt' => '', 'themes/b.txt' => '']);
-
-        $this->assertSame(
-            [
-                'site themes are not supported in this version; the theme/ directory is ignored',
-                'site themes are not supported in this version; the themes/ directory is ignored',
-            ],
-            SiteWarnings::themeDirectory($root),
-        );
+        $this->assertSame([], SiteWarnings::themeDirectory($root));
     }
 }

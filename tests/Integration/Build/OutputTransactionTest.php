@@ -430,6 +430,8 @@ final class OutputTransactionTest extends TestCase
             'inside content' => ['{root}/content/out', 'overlaps the content/'],
             'content inside the output' => ['{root}/content', 'overlaps the content/'],
             'inside public' => ['{root}/public/x', 'overlaps the public/'],
+            'inside theme' => ['{root}/theme/out', 'overlaps the theme/'],
+            'theme inside the output' => ['{root}/theme', 'overlaps the theme/'],
             'the site root' => ['{root}', 'contains the site'],
             'a parent of the site' => ['{root}/..', 'contains the site'],
             'dotted path into content' => ['{root}/./content/new-output', 'overlaps the content/'],
@@ -478,6 +480,17 @@ final class OutputTransactionTest extends TestCase
         $this->assertFilesystemError(fn () => $this->buildSite($root), 'symbolic link', $managed);
 
         $this->assertSame($before, self::snapshot($target));
+        $this->assertDirectoryDoesNotExist($root.'/dist');
+    }
+
+    #[Test]
+    public function a_symlinked_theme_folder_is_refused(): void
+    {
+        $root = $this->makeSite(self::tiny());
+        $target = $this->makeSite(['hooks/head.blade.php' => 'x']);
+        symlink($target, $root.'/theme');
+
+        $this->assertFilesystemError(fn () => $this->buildSite($root), 'symbolic link', 'theme');
         $this->assertDirectoryDoesNotExist($root.'/dist');
     }
 

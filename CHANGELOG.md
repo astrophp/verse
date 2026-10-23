@@ -7,8 +7,18 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+### Added
+
+- Hooks: a website can add its own Blade snippets to the default theme's pages with
+  `theme/hooks/<hook>.blade.php` (`head`, `body-start`, `main-start`, `main-end`, `body-end`,
+  `article-before`, `article-after`, `page-before`, `page-after`). Hooks see the page's data and
+  `verse()`, which has a new `isPreview()`; an error in a hook fails the build and names the file.
+  Themes place them with `@verseHook('head')`.
+
 ### Changed
 
+- A website's `theme/` folder is read instead of being ignored with a warning. Only `theme/hooks/`
+  is supported in it; anything else there is an error. `themes/` is still ignored with a warning.
 - Theme views call the `verse()` helper (`verse()->url('/articles/')`) instead of the `$__verse`
   variable, which is gone.
 

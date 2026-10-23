@@ -17,6 +17,7 @@ use Astro\Verse\Support\Warnings;
 use Astro\Verse\Theme\Theme;
 use Astro\Verse\Theme\ThemeRegistry;
 use Astro\Verse\View\RequiredViews;
+use Astro\Verse\View\SiteHooks;
 use Astro\Verse\View\SiteRenderer;
 use Astro\Verse\View\ThemeContext;
 use Closure;
@@ -196,12 +197,13 @@ final class Builder
     /**
      * Everything that reads the theme and the content, before any cache or staging directory is touched.
      *
-     * @return array{site: SiteModel, theme: Theme, manifest: ViteManifest}
+     * @return array{site: SiteModel, theme: Theme, manifest: ViteManifest, hooks: ?string}
      */
     private function prepare(BuildContext $context, Warnings $warnings): array
     {
         $theme = $this->themes->find($context->themeName());
         RequiredViews::assertPresent($theme);
+        $hooks = SiteHooks::load($context->root);
         $manifest = ViteManifest::load($theme);
 
         $warnings->addAll(SiteWarnings::placeholders($context->config));
@@ -212,21 +214,21 @@ final class Builder
             $site->registry->claim(OutputRegistry::THEME_PREFIX.$file, 'theme asset '.$file, ClaimSource::Theme);
         }
 
-        return ['site' => $site, 'theme' => $theme, 'manifest' => $manifest];
+        return ['site' => $site, 'theme' => $theme, 'manifest' => $manifest, 'hooks' => $hooks];
     }
 
     /**
      * Renders the prepared site into `$staging` and validates it.
      *
-     * @param  array{site: SiteModel, theme: Theme, manifest: ViteManifest}  $prepared
+     * @param  array{site: SiteModel, theme: Theme, manifest: ViteManifest, hooks: ?string}  $prepared
      * @param  string  $cache  the compiled Blade views directory
      * @return int number of HTML pages written
      */
     private function stageAndValidate(array $prepared, string $cache, string $staging, string $marker): int
     {
-        ['site' => $site, 'theme' => $theme, 'manifest' => $manifest] = $prepared;
+        ['site' => $site, 'theme' => $theme, 'manifest' => $manifest, 'hooks' => $hooks] = $prepared;
 
-        $renderer = new SiteRenderer($site, $theme, new ThemeContext($site, $theme, $manifest), $cache);
+        $renderer = new SiteRenderer($site, $theme, new ThemeContext($site, $theme, $manifest), $cache, $hooks);
         $pages = $this->stage($site, $renderer, $theme->distPath, $manifest, $staging, $marker);
         OutputValidator::validate($staging, $site->registry, $manifest);
 

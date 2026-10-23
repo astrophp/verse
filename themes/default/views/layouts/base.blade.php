@@ -30,8 +30,10 @@
 @if ($layout->accentCss !== null)
 <style>{!! $layout->accentCss !!}</style>
 @endif
+@verseHook('head')
 </head>
 <body>
+@verseHook('body-start')
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="site-header" id="site-header">
   <div class="header-inner shell">
@@ -51,7 +53,9 @@
   </div>
 </header>
 <main id="main-content" class="main shell" tabindex="-1">
+@verseHook('main-start')
 @yield('content')
+@verseHook('main-end')
 </main>
 <footer class="site-footer shell">
   <div class="footer-inner">
@@ -68,5 +72,6 @@
   </div>
   <div class="footer-credit">Built with <a href="https://github.com/astrophp/verse" rel="noopener">Verse</a></div>
 </footer>
+@verseHook('body-end')
 </body>
 </html>

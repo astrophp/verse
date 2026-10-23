@@ -27,6 +27,7 @@ final class PathGuard
         'dist',
         'content',
         'public',
+        'theme',
     ];
 
     /**
@@ -50,14 +51,14 @@ final class PathGuard
     }
 
     /**
-     * The checks that need no private state: symbolic links at `content`, `public` and `dist`, and an output
+     * The checks that need no private state: symbolic links at `content`, `public`, `theme` and `dist`, and an output
      * directory that is relative, a link, contains the site, overlaps the sources or sits in `.verse/`.
      * `verse check` runs only this, so it never has to look at `.verse/`.
      */
     public static function assertSources(BuildContext $context): void
     {
         $site = rtrim($context->root, '/');
-        foreach (['content', 'public', 'dist'] as $name) {
+        foreach (['content', 'public', 'theme', 'dist'] as $name) {
             if (is_link($site.'/'.$name)) {
                 throw new FilesystemException('symbolic links are not supported. Replace the link with the real folder.', $name);
             }
@@ -78,7 +79,7 @@ final class PathGuard
         if ($real === $root || self::inside($root, $real)) {
             throw new FilesystemException('the output directory '.$output.' contains the site; choose a folder inside it, such as dist.');
         }
-        foreach (['content', 'public'] as $source) {
+        foreach (['content', 'public', 'theme'] as $source) {
             $path = self::resolve($root.'/'.$source);
             if (self::inside($real, $path) || self::inside($path, $real)) {
                 throw new FilesystemException('the output directory '.$output.' overlaps the '.$source.'/ folder. Choose another output.');

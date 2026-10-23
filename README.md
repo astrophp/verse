@@ -117,6 +117,8 @@ my-site/
 │   └── legal/
 │       └── privacy.md               # plain folder → /legal/privacy/
 ├── public/                          # copied to the output root unchanged (optional)
+├── theme/
+│   └── hooks/                       # Blade snippets added to the theme's pages (optional)
 ├── .verse/                          # private generated state (ignored)
 └── dist/                            # production output (ignored)
 ```
@@ -128,7 +130,7 @@ my-site/
 - `page.md` cannot sit directly in `content/` or `content/articles/`, subfolders of
   `content/articles/` must be bundles, and `index.md` / `_index.md` are reserved. Verse fails with an
   error naming the file and suggesting a fix.
-- Hidden files are ignored; symbolic links under `content/` or `public/` are rejected.
+- Hidden files are ignored; symbolic links under `content/`, `public/` or `theme/` are rejected.
 
 ## Front matter
 
@@ -234,9 +236,10 @@ verse serve [--port=8000] [--no-drafts]
 ```
 
 Builds the site into `.verse/preview/`, serves it on `127.0.0.1` and rebuilds when `verse.yaml`,
-`content/` or `public/` change; open pages reload automatically. Drafts and scheduled articles are
+`content/`, `public/` or `theme/` change; open pages reload automatically. Drafts and scheduled articles are
 shown with a badge and a `noindex` instruction. `--no-drafts` previews exactly what `verse build` will
-publish, except that the preview does not generate `sitemap.xml`. A failed rebuild prints the error
+publish, except that the preview does not generate `sitemap.xml` and that hooks can tell the preview
+apart (`verse()->isPreview()`, see [Hooks](#hooks-adding-to-every-page)). A failed rebuild prints the error
 and shows it as an overlay on open pages, which keep the last good preview.
 
 ## `verse build`
@@ -251,7 +254,7 @@ previous `dist/` untouched. Verse marks its output with a `.verse-output` file a
 Themes live in this repository under `themes/<name>/` and are selected with `theme.name`; only
 `default` ships today. A theme has a `theme.yaml` (name, description, Vite entries, settings with
 defaults), Blade views in `views/`, sources in `src/` and prebuilt assets in `dist/`. Websites cannot
-override views or styles yet.
+override views or styles yet; they can add [hooks](#hooks-adding-to-every-page).
 
 To work on the default theme you need Node.js:
 
@@ -264,6 +267,62 @@ npm run watch      # rebuild on change
 A `verse serve` running from the same checkout picks up view and asset changes. The built
 `themes/default/dist/` is committed, so installing Verse never requires Node.js; commit it together
 with the source change.
+
+## Hooks: adding to every page
+
+A website can add its own markup (an analytics tag, a banner, a script) to the pages of the theme
+without changing the theme. Put a Blade file named after a hook in `theme/hooks/`, for example
+`theme/hooks/head.blade.php`. The theme renders it at that place on every page it applies to; a hook
+without a file renders nothing.
+
+| Hook | Where the default theme renders it | Pages |
+| --- | --- | --- |
+| `head` | last thing in `<head>`, after the theme's own tags | all |
+| `body-start` | right after `<body>`, before the skip link | all |
+| `main-start` | first thing inside `<main>` | all |
+| `main-end` | last thing inside `<main>` | all |
+| `body-end` | right before `</body>` | all |
+| `article-before` | right before the article's text, after the mobile table of contents | articles |
+| `article-after` | right after the article's text | articles |
+| `page-before` | right before a standalone page's text | standalone pages |
+| `page-after` | right after a standalone page's text | standalone pages |
+
+"All" means the home page, standalone pages, the archive, articles, the tag index, tag archives and the
+404 page. The position in the table is where a hook appears in the HTML, not the order Verse renders
+them in: an article's `article-before` is rendered before the layout's `head`.
+
+A hook receives the data of the view that includes it: `$layout`, `$site` (the `verse.yaml`
+configuration, `$site->extra` holds your own keys), `$theme` (the resolved theme settings), `$menu`,
+`$page` (the Markdown page; `null` on generated pages such as the home page, the archive and the tag
+pages), `$articles` (`null` on standalone pages and the 404 page), and the role's own data such as
+`$article` on article pages. A hook shared by several kinds of page should check what it uses
+(`@isset($article)`). The `verse()` helper works too: `verse()->url('/')`, `verse()->asset('logo.svg')`
+and `verse()->isPreview()`, which is true while `verse serve` renders the site and false for
+`verse build` and `verse check`.
+
+```yaml
+# verse.yaml
+extra:
+  umami_id: 00000000-0000-0000-0000-000000000000
+```
+
+```blade
+{{-- theme/hooks/head.blade.php: Umami analytics, left out of verse serve --}}
+@unless (verse()->isPreview())
+<script defer src="https://cloud.umami.is/script.js" data-website-id="{{ $site->extra['umami_id'] }}"></script>
+@endunless
+```
+
+`{{ }}` escapes what it prints; `{!! !!}` prints it as it is. Unlike a theme's views, a hook never
+fails silently: an undefined variable or any other error in it fails the build with
+`theme error in theme/hooks/head.blade.php: …`, and the previous `dist/` stays as it was.
+
+Only `theme/hooks/<hook>.blade.php` is supported in `theme/`; any other file or folder there, a
+misspelled hook name or a symbolic link is an error that names the path.
+
+Hooks are Blade, and Blade compiles to PHP, so a website's `theme/` folder is code that the site's
+owner writes, like a theme: building the website runs it. Markdown and front matter still never
+execute.
 
 ## Development
 

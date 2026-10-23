@@ -11,8 +11,8 @@ use Symfony\Component\Yaml\Yaml;
 use Throwable;
 
 /**
- * Polls the inputs of a build for changes: `verse.yaml`, `content/`, `public/` and the whole root of the
- * selected theme. Each file is recorded with size and mtime, plus an md5 for text files of any size (an edit
+ * Polls the inputs of a build for changes: `verse.yaml`, `content/`, `public/`, `theme/` and the whole root of
+ * the selected theme. Each file is recorded with size and mtime, plus an md5 for text files of any size (an edit
  * that keeps size and mtime is still seen). Nothing is watched inside `.verse/`, `dist/`, `node_modules/`,
  * `vendor/` or dot entries, except `public/.well-known/` and the theme's `dist/.vite/`.
  */
@@ -110,16 +110,34 @@ final class Watcher
         $this->addEntry($entries, ConfigLoader::SITE_FILE, $config);
         $this->scanDirectory($entries, 'content', $this->root.'/content', []);
         $this->scanDirectory($entries, 'public', $this->root.'/public', ['.well-known']);
+        $this->scanSiteTheme($entries);
         $this->scanDirectory($entries, 'theme:', $this->themeRoot, ['dist/.vite']);
 
         return $entries;
     }
 
     /**
+     * The website's own `theme/` folder. Its root's state is an input too (a file or link named `theme` fails the
+     * build), and nothing in it is skipped: a `node_modules/` there is invalid and must reach validation.
+     *
+     * @param  array<string, array{int, int, ?string}>  $entries
+     */
+    private function scanSiteTheme(array &$entries): void
+    {
+        $theme = $this->root.'/theme';
+        if (is_dir($theme) && ! is_link($theme)) {
+            $entries['theme/'] = [-2, 0, null];
+            $this->scanDirectory($entries, 'theme', $theme, [], skipVendored: false);
+        } else {
+            $this->addEntry($entries, 'theme', $theme);
+        }
+    }
+
+    /**
      * @param  array<string, array{int, int, ?string}>  $entries
      * @param  list<string>  $allowedDot  dot directories (relative to `$directory`) that are watched anyway
      */
-    private function scanDirectory(array &$entries, string $prefix, string $directory, array $allowedDot, string $relative = ''): void
+    private function scanDirectory(array &$entries, string $prefix, string $directory, array $allowedDot, string $relative = '', bool $skipVendored = true): void
     {
         $names = @scandir($directory);
         if ($names === false) {
@@ -135,7 +153,7 @@ final class Watcher
             if (str_starts_with($name, '.') && ! in_array($path, $allowedDot, true)) {
                 continue;
             }
-            if (in_array($name, self::SKIPPED_DIRECTORIES, true) || $absolute === $this->root.'/.verse' || $absolute === $this->root.'/dist') {
+            if ($skipVendored && (in_array($name, self::SKIPPED_DIRECTORIES, true) || $absolute === $this->root.'/.verse' || $absolute === $this->root.'/dist')) {
                 continue;
             }
 
@@ -143,7 +161,7 @@ final class Watcher
             if (is_dir($absolute) && ! is_link($absolute)) {
                 // directories are inputs too: an empty or invalid one can fail a build
                 $entries[$key.'/'] = [-2, 0, null];
-                $this->scanDirectory($entries, $prefix, $absolute, $allowedDot, $path);
+                $this->scanDirectory($entries, $prefix, $absolute, $allowedDot, $path, $skipVendored);
 
                 continue;
             }

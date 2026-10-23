@@ -15,7 +15,9 @@ The public roadmap is `ROADMAP.md`. Read it before starting any work.
 
 - **Websites never need Node.js.** Vite runs only in this repository to build `themes/*/dist`,
   which is committed.
-- **Content never executes.** No PHP or Blade from Markdown; raw HTML is escaped.
+- **Content never executes.** No PHP or Blade from Markdown; raw HTML is escaped. Hooks in a website's
+  `theme/hooks/` are Blade written by the site owner, like a theme; content (Markdown, front matter)
+  never reaches Blade.
 - **Output is never left half-written.** Builds are staged and promoted only on success; only
   marker-carrying folders are replaced.
 - **Errors name the file and the fix.** No stack traces for website problems.

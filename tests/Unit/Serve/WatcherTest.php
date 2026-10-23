@@ -215,6 +215,64 @@ final class WatcherTest extends TestCase
     }
 
     #[Test]
+    public function it_watches_hooks_in_the_site_theme_folder(): void
+    {
+        $root = $this->site();
+        $watcher = $this->watcher($root);
+
+        mkdir($root.'/theme/hooks', 0775, true);
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme/', 'theme/hooks/'], $watcher->changes());
+
+        file_put_contents($root.'/theme/hooks/head.blade.php', 'one');
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme/hooks/head.blade.php'], $watcher->changes());
+
+        file_put_contents($root.'/theme/hooks/head.blade.php', 'two');
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme/hooks/head.blade.php'], $watcher->changes());
+
+        unlink($root.'/theme/hooks/head.blade.php');
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme/hooks/head.blade.php'], $watcher->changes());
+    }
+
+    #[Test]
+    public function a_file_or_link_named_theme_is_an_input(): void
+    {
+        $root = $this->site();
+        $watcher = $this->watcher($root);
+
+        file_put_contents($root.'/theme', 'x');
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme'], $watcher->changes());
+
+        unlink($root.'/theme');
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme'], $watcher->changes());
+
+        symlink($root.'/content', $root.'/theme');
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme'], $watcher->changes());
+    }
+
+    #[Test]
+    public function an_invalid_folder_in_the_site_theme_reaches_validation(): void
+    {
+        $root = $this->site();
+        mkdir($root.'/theme/hooks', 0775, true);
+        $watcher = $this->watcher($root);
+
+        mkdir($root.'/theme/views');
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme/views/'], $watcher->changes());
+
+        mkdir($root.'/theme/node_modules');
+        $this->assertTrue($watcher->poll());
+        $this->assertSame(['theme/node_modules/'], $watcher->changes());
+    }
+
+    #[Test]
     public function it_watches_the_selected_theme_except_node_modules_and_dot_entries(): void
     {
         $themes = $this->themeRegistry([

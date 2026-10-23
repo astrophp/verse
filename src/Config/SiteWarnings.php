@@ -38,19 +38,16 @@ final class SiteWarnings
     }
 
     /**
-     * Site-level `theme/` and `themes/` directories are not supported in this version.
+     * A site-level `themes/` directory is not supported in this version.
      *
      * @return list<string>
      */
     public static function themeDirectory(string $root): array
     {
-        $warnings = [];
-        foreach (['theme', 'themes'] as $directory) {
-            if (is_dir(rtrim($root, '/').'/'.$directory)) {
-                $warnings[] = 'site themes are not supported in this version; the '.$directory.'/ directory is ignored';
-            }
+        if (is_dir(rtrim($root, '/').'/themes')) {
+            return ['site themes are not supported in this version; the themes/ directory is ignored'];
         }
 
-        return $warnings;
+        return [];
     }
 }

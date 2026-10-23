@@ -13,8 +13,10 @@
 @endif
 </header>
 <div class="article-layout"><div>
+@verseHook('page-before')
 <article class="prose">
 {!! $bodyHtml !!}
 </article>
+@verseHook('page-after')
 </div></div>
 @endsection
