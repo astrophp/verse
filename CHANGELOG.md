@@ -7,6 +7,8 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+## v0.4.0 - 2026-10-23
+
 ### Added
 
 - Hooks: a website can add its own Blade snippets to the default theme's pages with
