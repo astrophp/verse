@@ -7,6 +7,12 @@ commands, configuration keys, theme views and output.
 
 ## Unreleased
 
+### Added
+
+- An Atom feed at `feed.xml` with the 20 newest articles (title, link, dates, description and tags), on
+  by default; `feed: false` in `verse.yaml` turns it off. Pages link to it with
+  `<link rel="alternate">`. Preview builds do not write it.
+
 ## v0.4.0 - 2026-10-23
 
 ### Added

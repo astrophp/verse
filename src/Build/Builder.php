@@ -250,6 +250,9 @@ final class Builder
         if ($site->context->publishesSitemap()) {
             $this->put($staging, Sitemap::PATH, (new Sitemap($site))->xml());
         }
+        if ($site->context->publishesFeed()) {
+            $this->put($staging, Feed::PATH, (new Feed($site))->xml());
+        }
 
         foreach ($manifest->files() as $file) {
             $this->import($staging, OutputRegistry::THEME_PREFIX.$file, $distPath.'/'.$file);

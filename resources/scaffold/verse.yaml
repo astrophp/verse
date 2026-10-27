@@ -8,3 +8,6 @@ social_links:
 
 # Set to false to leave sitemap.xml out of `verse build`.
 sitemap: true
+
+# Set to false to leave feed.xml (the Atom feed) out of `verse build`.
+feed: true

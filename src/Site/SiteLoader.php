@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Astro\Verse\Site;
 
 use Astro\Verse\Build\BuildContext;
+use Astro\Verse\Build\Feed;
 use Astro\Verse\Build\SearchIndex;
 use Astro\Verse\Build\Sitemap;
 use Astro\Verse\Content\ContentScanner;
@@ -214,6 +215,9 @@ final class SiteLoader
         $registry->claim(SearchIndex::PATH, 'the search index', ClaimSource::System);
         if ($context->publishesSitemap()) {
             $registry->claim(Sitemap::PATH, 'the sitemap', ClaimSource::System);
+        }
+        if ($context->publishesFeed()) {
+            $registry->claim(Feed::PATH, 'the feed', ClaimSource::System);
         }
         $registry->claim('.verse-output', 'the Verse output marker', ClaimSource::System);
 

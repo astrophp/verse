@@ -94,6 +94,25 @@ final class ConfigLoaderTest extends TestCase
     }
 
     #[Test]
+    public function the_feed_is_on_by_default_and_accepts_a_boolean(): void
+    {
+        $this->assertTrue($this->parse("title: x\n")->feed);
+        $this->assertTrue($this->parse("title: x\nfeed: true\n")->feed);
+        $this->assertFalse($this->parse("title: x\nfeed: false\n")->feed);
+    }
+
+    #[Test]
+    #[DataProvider('invalidSitemapValues')]
+    public function it_rejects_a_feed_that_is_not_a_boolean(string $value): void
+    {
+        $this->assertConfigError(
+            fn () => $this->parse("title: x\nfeed: ".$value."\n"),
+            'feed',
+            'field "feed": expected true or false',
+        );
+    }
+
+    #[Test]
     public function it_loads_a_full_file(): void
     {
         $config = $this->parse(<<<'YAML'

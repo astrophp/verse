@@ -65,7 +65,7 @@ final class ConfigLoader
         $fields = new Fields(YamlMap::parse($yaml, $error), $error);
 
         $fields->rejectUnknown(
-            ['title', 'tagline', 'url', 'description', 'author', 'social_links', 'language', 'timezone', 'sitemap', 'theme', 'extra'],
+            ['title', 'tagline', 'url', 'description', 'author', 'social_links', 'language', 'timezone', 'sitemap', 'feed', 'theme', 'extra'],
             ' (put custom values under "extra")',
         );
 
@@ -90,6 +90,7 @@ final class ConfigLoader
             theme: $this->theme($fields, $root, $error),
             extra: $fields->map('extra') ?? [],
             sitemap: $fields->bool('sitemap', true),
+            feed: $fields->bool('feed', true),
         );
     }
 

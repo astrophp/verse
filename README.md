@@ -183,6 +183,7 @@ social_links:
 language: en
 timezone: Europe/Berlin
 sitemap: true                      # the default; false leaves sitemap.xml out of `verse build`
+feed: true                         # the default; false leaves feed.xml out of `verse build`
 theme:
   name: default
   logo: null                       # path or URL
@@ -203,6 +204,7 @@ extra:
 | `language` | `en` | `<html lang>` and date formatting. |
 | `timezone` | `UTC` | Used for dates without an offset and for deciding what is scheduled. |
 | `sitemap` | `true` | `verse build` writes `sitemap.xml`; `false` leaves it out. |
+| `feed` | `true` | `verse build` writes the Atom feed `feed.xml`; `false` leaves it out. |
 | `theme` | `{name: default}` | The bundled theme and its settings (`logo`, `accent`, `toc` for `default`). |
 | `extra` | `{}` | Your own values, available to templates. |
 
@@ -212,6 +214,13 @@ Unknown keys and invalid values fail with an error naming the field.
 built from `url`. Drafts, scheduled articles, external articles, pages whose `canonical` is on another
 host and `404.html` are left out. A page's `lastmod` is its `date`. A `public/sitemap.xml` is an error
 unless you set `sitemap: false`.
+
+`feed.xml` is an Atom feed of the 20 newest articles: title, link, date, `updated`, `description` as
+the summary and tags. It carries no article content, so give articles a `description`. External
+articles link to their `external_url`. The feed's author is `author`, or the site title without one.
+An entry's id is its URL: changing `url`, a `slug` or `permalink`, or an `external_url` shows the
+article as new in feed readers. Two articles with the same URL in the feed are an error. Pages link to
+the feed with `<link rel="alternate">`. A `public/feed.xml` is an error unless you set `feed: false`.
 
 ## Routes
 
@@ -226,6 +235,7 @@ unless you set `sitemap: false`.
 | `/404.html` | Not-found page. |
 | `/search.json` | The static search index. |
 | `/sitemap.xml` | The sitemap, unless `sitemap: false`. |
+| `/feed.xml` | The Atom feed, unless `feed: false`. |
 
 The main menu is Home · Articles · Tags, followed by pages with `menu: true` (by `order`, then by title).
 
@@ -238,9 +248,9 @@ verse serve [--port=8000] [--no-drafts]
 Builds the site into `.verse/preview/`, serves it on `127.0.0.1` and rebuilds when `verse.yaml`,
 `content/`, `public/` or `theme/` change; open pages reload automatically. Drafts and scheduled articles are
 shown with a badge and a `noindex` instruction. `--no-drafts` previews exactly what `verse build` will
-publish, except that the preview does not generate `sitemap.xml` and that hooks can tell the preview
-apart (`verse()->isPreview()`, see [Hooks](#hooks-adding-to-every-page)). A failed rebuild prints the error
-and shows it as an overlay on open pages, which keep the last good preview.
+publish, except that the preview does not generate `sitemap.xml` or `feed.xml` and that hooks can tell
+the preview apart (`verse()->isPreview()`, see [Hooks](#hooks-adding-to-every-page)). A failed rebuild
+prints the error and shows it as an overlay on open pages, which keep the last good preview.
 
 ## `verse build`
 
