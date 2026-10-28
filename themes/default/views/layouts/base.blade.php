@@ -13,6 +13,9 @@
 <link rel="canonical" href="{{ $layout->canonical }}">
 <meta property="og:url" content="{{ $layout->canonical }}">
 @endif
+@if ($layout->feedUrl !== null)
+<link rel="alternate" type="application/atom+xml" title="{{ $layout->brandName }}" href="{{ $layout->feedUrl }}">
+@endif
 <meta property="og:title" content="{{ $layout->pageTitle }}">
 @if ($layout->description !== null)
 <meta property="og:description" content="{{ $layout->description }}">

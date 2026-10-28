@@ -25,6 +25,7 @@ final readonly class SiteConfig
         public ThemeSettings $theme,
         public array $extra,
         public bool $sitemap = true,
+        public bool $feed = true,
     ) {}
 
     public function basePath(): string

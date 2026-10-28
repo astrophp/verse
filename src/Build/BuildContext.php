@@ -39,6 +39,14 @@ final readonly class BuildContext
         return $this->mode === BuildMode::Production && $this->config->sitemap;
     }
 
+    /**
+     * Whether this build writes `feed.xml`: production builds unless `feed: false`.
+     */
+    public function publishesFeed(): bool
+    {
+        return $this->mode === BuildMode::Production && $this->config->feed;
+    }
+
     public function themeName(): string
     {
         return $this->config->theme->name;

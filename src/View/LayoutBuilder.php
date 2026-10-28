@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Astro\Verse\View;
 
+use Astro\Verse\Build\Feed;
 use Astro\Verse\Site\SiteModel;
 use Astro\Verse\View\Model\Layout;
 use Astro\Verse\View\Model\Link;
@@ -56,6 +57,7 @@ final readonly class LayoutBuilder
             pageTitle: $pageTitle,
             description: $description,
             canonical: $canonical,
+            feedUrl: $this->site->context->publishesFeed() ? $this->theme->asset(Feed::PATH) : null,
             ogType: $ogType,
             ogImage: $ogImage,
             noindex: $noindex,
